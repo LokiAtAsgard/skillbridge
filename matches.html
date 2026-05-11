@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Matches — SkillBridge</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar" id="mainNavbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Skill<span>Bridge</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="listings.html" class="nav-link">Browse Jobs</a></li>
+      <li><a href="matches.html" class="nav-link active">My Matches</a></li>
+      <li><a href="employers.html" class="nav-link">For Employers</a></li>
+      <li><a href="admin.html" class="nav-link">Admin</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="btn-outline-small">Log In</a>
+      <a href="#" class="btn-primary-small">Sign Up Free</a>
+    </div>
+    <button class="nav-hamburger" onclick="toggleMobileNav()">&#9776;</button>
+  </div>
+</nav>
+
+<div class="page-header-bar">
+  <div class="page-header-container">
+    <h1 class="page-title">My Matches</h1>
+    <p class="page-subtitle">Listings where both you and the employer swiped up. Contact is now unlocked.</p>
+  </div>
+</div>
+
+<main style="padding: 48px 0 80px; background: var(--surface); min-height: 60vh;">
+  <div style="max-width: 1280px; margin: 0 auto; padding: 0 24px;">
+
+    <!-- Not logged in state -->
+    <div id="notLoggedInState" style="text-align: center; padding: 80px 24px;">
+      <div style="font-size: 56px; margin-bottom: 20px;">🔒</div>
+      <h2 style="font-family: 'Playfair Display', serif; font-size: 28px; color: var(--text-primary); margin-bottom: 12px;">
+        You need an account to see your matches
+      </h2>
+      <p style="font-size: 15px; color: var(--text-muted); max-width: 420px; margin: 0 auto 28px; line-height: 1.65;">
+        Create a free profile, add your skills, and start swiping. When an employer also swipes up on you, it is a match and you can start chatting.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a href="listings.html" class="btn-primary-large">Browse Listings</a>
+        <a href="#" class="btn-outline-large">Create Profile</a>
+      </div>
+    </div>
+
+    <!-- Sample matched state (shown as demo) -->
+    <div id="matchesDemoState" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+        <div style="font-size: 14px; color: var(--text-muted);" id="matchCount">3 matches found</div>
+        <button class="btn-outline-small" onclick="window.print()">&#128424; Print</button>
+      </div>
+      <div class="job-cards-grid" id="matchesGrid"></div>
+    </div>
+
+    <!-- Toggle demo button -->
+    <div style="text-align: center; margin-top: 40px;">
+      <button class="btn-text-small" onclick="toggleMatchDemo()" id="demoToggleBtn">
+        Show Demo Matches
+      </button>
+    </div>
+
+  </div>
+</main>
+
+<!-- How matches work -->
+<section style="padding: 64px 0; background: var(--white);">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-eyebrow">How It Works</div>
+      <h2 class="section-headline">How Matches Happen</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">01</div>
+        <div class="step-icon">&#8593;</div>
+        <h3 class="step-title">You Swipe Up</h3>
+        <p class="step-detail">On the Browse page, swipe up or click Interested on any listing you want to connect with.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">02</div>
+        <div class="step-icon">&#9889;</div>
+        <h3 class="step-title">Employer Swipes Up</h3>
+        <p class="step-detail">The employer reviews your profile and also swipes up. Both sides have to be interested for a match to happen.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">03</div>
+        <div class="step-icon">&#128172;</div>
+        <h3 class="step-title">Chat Unlocks</h3>
+        <p class="step-detail">Once matched, contact information is revealed and you can message each other directly to schedule an interview.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-bottom">
+      <p>2024 SkillBridge. BSIT IT3A — Technopreneurship. Developed by Manhic, Orlanes, and Ramos.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+<script src="xml-loader.js"></script>
+<script>
+  var demoVisible = false;
+
+  function toggleMatchDemo() {
+    demoVisible = !demoVisible;
+    var notLoggedIn = document.getElementById('notLoggedInState');
+    var demoState   = document.getElementById('matchesDemoState');
+    var demoBtn     = document.getElementById('demoToggleBtn');
+
+    if (demoVisible) {
+      notLoggedIn.style.display = 'none';
+      demoState.style.display   = 'block';
+      demoBtn.textContent       = 'Hide Demo';
+      loadDemoMatches();
+    } else {
+      notLoggedIn.style.display = 'block';
+      demoState.style.display   = 'none';
+      demoBtn.textContent       = 'Show Demo Matches';
+    }
+  }
+
+  function loadDemoMatches() {
+    loadXMLListings(function(allListings) {
+      var demoMatches = allListings.filter(function(item) {
+        return item.featured === 'true';
+      }).slice(0, 3);
+
+      var matchesGrid = document.getElementById('matchesGrid');
+      matchesGrid.innerHTML = demoMatches.map(function(listing) {
+        var skillTagsHTML = listing.skills.split(',').map(function(skill) {
+          return '<span class="card-skill-tag">' + skill.trim() + '</span>';
+        }).join('');
+
+        return '<div class="job-card-item">' +
+          '<div class="card-banner-area">' + listing.icon +
+          '<span class="card-verified-tag">&#10003; PESO</span>' +
+          '<span class="card-featured-tag" style="background: var(--green-main);">&#10084; Matched</span>' +
+          '</div>' +
+          '<div class="card-body-area">' +
+          '<span class="card-type-badge' + (listing.type === 'internship' ? ' internship-badge' : '') + '">' + listing.type + '</span>' +
+          '<div class="card-company">' + listing.company + '</div>' +
+          '<div class="card-title">' + listing.title + '</div>' +
+          '<div class="card-location">&#128205; ' + listing.city + '</div>' +
+          '<div class="card-skills">' + skillTagsHTML + '</div>' +
+          '<div class="card-stats">' +
+          '<div><div class="card-stat-val">' + formatCurrency(listing.allowance) + '</div><div class="card-stat-key">Per Day</div></div>' +
+          '<div><div class="card-stat-val">' + listing.duration + '</div><div class="card-stat-key">Duration</div></div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="card-action-row">' +
+          '<button class="card-act-btn" style="background:#dbeafe;color:#1d4ed8;flex:2;" onclick="showToast(\'Chat feature requires account login.\')">&#128172; Message Employer</button>' +
+          '<button class="card-act-btn card-act-save" onclick="showToast(\'Interview scheduled!\')">&#128197; Schedule</button>' +
+          '</div></div>';
+      }).join('');
+
+      document.getElementById('matchCount').textContent = demoMatches.length + ' demo matches shown';
+    });
+  }
+</script>
+</body>
+</html>

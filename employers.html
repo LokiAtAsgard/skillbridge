@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For Employers — SkillBridge</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar" id="mainNavbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Skill<span>Bridge</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="listings.html" class="nav-link">Browse Jobs</a></li>
+      <li><a href="matches.html" class="nav-link">My Matches</a></li>
+      <li><a href="employers.html" class="nav-link active">For Employers</a></li>
+      <li><a href="admin.html" class="nav-link">Admin</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="btn-outline-small">Log In</a>
+      <a href="admin.html" class="btn-primary-small">Post a Job</a>
+    </div>
+    <button class="nav-hamburger" onclick="toggleMobileNav()">&#9776;</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section style="background: linear-gradient(158deg, var(--green-deepest) 0%, #0a3d1c 60%, var(--green-dark) 100%); padding: 120px 0 80px; margin-top: var(--nav-height);">
+  <div class="section-container" style="text-align: center;">
+    <div class="section-eyebrow" style="color: var(--green-bright);">For SMEs and Businesses</div>
+    <h1 style="font-family: 'Playfair Display', serif; font-size: clamp(32px,5vw,52px); color: white; line-height: 1.15; margin-bottom: 18px; max-width: 720px; margin-left: auto; margin-right: auto;">
+      Find Pre-Matched Apprentices Without the Paperwork
+    </h1>
+    <p style="font-size: 17px; color: rgba(255,255,255,.68); max-width: 560px; margin: 0 auto 36px; line-height: 1.65;">
+      Post your listing once. SkillBridge matches you with youth who already have the skills you need, filtered by location. All employers are verified through PESO before they can post.
+    </p>
+    <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+      <a href="admin.html" class="btn-primary-large">Post a Job Now</a>
+      <a href="#plans" class="btn-outline-large" style="color: white; border-color: white;">See Pricing Plans</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section style="background: var(--green-main); padding: 32px 0;">
+  <div class="section-container">
+    <div style="display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; text-align: center;">
+      <div>
+        <div style="font-size: 32px; font-weight: 700; color: white;">99.5%</div>
+        <div style="font-size: 12px; color: rgba(255,255,255,.7); margin-top: 4px;">of PH businesses are SMEs</div>
+      </div>
+      <div>
+        <div style="font-size: 32px; font-weight: 700; color: white;">65%</div>
+        <div style="font-size: 12px; color: rgba(255,255,255,.7); margin-top: 4px;">of national employment from SMEs</div>
+      </div>
+      <div>
+        <div style="font-size: 32px; font-weight: 700; color: white;">18,442</div>
+        <div style="font-size: 12px; color: rgba(255,255,255,.7); margin-top: 4px;">formal placements in 2023 only</div>
+      </div>
+      <div>
+        <div style="font-size: 32px; font-weight: 700; color: white;">Free</div>
+        <div style="font-size: 12px; color: rgba(255,255,255,.7); margin-top: 4px;">to get started for all SMEs</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS FOR EMPLOYERS -->
+<section style="padding: 88px 0; background: var(--surface);">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-eyebrow">Simple Process</div>
+      <h2 class="section-headline">How It Works for You</h2>
+      <p class="section-description">No complicated setup. No HR department needed.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">01</div>
+        <div class="step-icon">&#127963;</div>
+        <h3 class="step-title">Register and Get Verified</h3>
+        <p class="step-detail">Create your employer account. Our team and PESO officers verify your business to give you the Verified Employer badge.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">02</div>
+        <div class="step-icon">&#128203;</div>
+        <h3 class="step-title">Post Your Listing</h3>
+        <p class="step-detail">Fill out the job details, required skills from TESDA taxonomy, duration, allowance, and location. Takes less than five minutes.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">03</div>
+        <div class="step-icon">&#129302;</div>
+        <h3 class="step-title">Get AI-Ranked Candidates</h3>
+        <p class="step-detail">The system automatically surfaces the best-matched youth based on skill alignment and proximity. You review and swipe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section style="padding: 88px 0; background: var(--white);">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-eyebrow">Platform Features</div>
+      <h2 class="section-headline">Everything You Need to Hire Right</h2>
+    </div>
+    <div class="trust-grid six-col">
+      <div class="trust-card">
+        <div class="trust-icon">&#9989;</div>
+        <h3 class="trust-title">PESO-Verified Badge</h3>
+        <p class="trust-detail">Your listing shows a verified badge that youth can trust. Required before any posting goes live.</p>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">&#129302;</div>
+        <h3 class="trust-title">AI Candidate Ranking</h3>
+        <p class="trust-detail">Best-matched candidates appear first. No sorting through hundreds of irrelevant applicants.</p>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">&#127775;</div>
+        <h3 class="trust-title">Featured Listings</h3>
+        <p class="trust-detail">Pay for priority placement and your listing appears at the top of results for youth in your area.</p>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">&#128200;</div>
+        <h3 class="trust-title">Analytics Dashboard</h3>
+        <p class="trust-detail">See how many youth viewed your listing, how many swiped up, and how many matched with you.</p>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">&#128172;</div>
+        <h3 class="trust-title">Permission-Based Chat</h3>
+        <p class="trust-detail">Only matched candidates can message you. No spam. No cold messages from unqualified applicants.</p>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">&#128197;</div>
+        <h3 class="trust-title">Interview Scheduler</h3>
+        <p class="trust-detail">Built-in calendar lets you set interview times directly in the chat. Firebase sends push notifications.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING PLANS -->
+<section style="padding: 88px 0; background: var(--green-ghost);" id="plans">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-eyebrow">Pricing Plans</div>
+      <h2 class="section-headline">Simple and Transparent Pricing</h2>
+      <p class="section-description">Start free. Upgrade when you are ready to scale your hiring.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 900px; margin: 0 auto;">
+
+      <!-- Free -->
+      <div class="plan-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">&#8369;0</div>
+        <div class="plan-period">forever</div>
+        <ul class="plan-features">
+          <li>1 active job posting</li>
+          <li>Basic candidate matching</li>
+          <li>PESO verification included</li>
+          <li>Standard listing placement</li>
+          <li>Permission-based chat</li>
+        </ul>
+        <a href="admin.html" class="btn-outline-small plan-btn" style="display:block; text-align:center; margin-top:16px;">Get Started</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="plan-card plan-card-featured">
+        <div class="plan-badge">Most Popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">&#8369;999</div>
+        <div class="plan-period">per month</div>
+        <ul class="plan-features">
+          <li>Up to 10 active postings</li>
+          <li>Featured listing placement</li>
+          <li>AI candidate ranking</li>
+          <li>Analytics dashboard</li>
+          <li>Priority support</li>
+          <li>Interview scheduler</li>
+        </ul>
+        <a href="admin.html" class="btn-primary-small plan-btn" style="display:block; text-align:center; margin-top:16px;">Start Free Trial</a>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="plan-card">
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-price">Custom</div>
+        <div class="plan-period">negotiated</div>
+        <ul class="plan-features">
+          <li>Unlimited postings</li>
+          <li>PESO/LGU institutional license</li>
+          <li>Bulk hiring tools</li>
+          <li>Full analytics export</li>
+          <li>Dedicated account manager</li>
+          <li>DOLE/TESDA integration</li>
+        </ul>
+        <a href="admin.html" class="btn-outline-small plan-btn" style="display:block; text-align:center; margin-top:16px;">Contact Us</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- TRUST / VERIFICATION -->
+<section style="padding: 88px 0; background: var(--white);">
+  <div class="section-container">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;">
+      <div>
+        <div class="section-eyebrow">Safety and Trust</div>
+        <h2 class="section-headline" style="text-align: left; margin-bottom: 18px;">Why Youth Trust SkillBridge Employers</h2>
+        <p style="font-size: 15px; color: var(--text-muted); line-height: 1.65; margin-bottom: 24px;">
+          Scam job postings are a real problem in the Philippines. SkillBridge addresses this by requiring all employers to go through PESO verification before any listing goes live. Youth can see your Verified badge and know the opportunity is legitimate.
+        </p>
+        <ul style="display: flex; flex-direction: column; gap: 12px;">
+          <li style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: var(--gray-600);">
+            <span style="color: var(--green-main); font-weight: 700; font-size: 16px; flex-shrink: 0;">&#10003;</span>
+            Business registration verified through PESO
+          </li>
+          <li style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: var(--gray-600);">
+            <span style="color: var(--green-main); font-weight: 700; font-size: 16px; flex-shrink: 0;">&#10003;</span>
+            Listings reviewed before going live
+          </li>
+          <li style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: var(--gray-600);">
+            <span style="color: var(--green-main); font-weight: 700; font-size: 16px; flex-shrink: 0;">&#10003;</span>
+            Report and flag system for suspicious activity
+          </li>
+          <li style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: var(--gray-600);">
+            <span style="color: var(--green-main); font-weight: 700; font-size: 16px; flex-shrink: 0;">&#10003;</span>
+            Allowance and duration must follow DOLE DO 186-17
+          </li>
+        </ul>
+      </div>
+      <div style="background: var(--green-ghost); border-radius: 20px; padding: 36px; border: 1px solid var(--gray-200);">
+        <div style="font-size: 48px; margin-bottom: 16px; text-align: center;">&#127963;</div>
+        <h3 style="font-size: 18px; font-weight: 700; color: var(--green-deepest); margin-bottom: 10px; text-align: center;">How to Get Verified</h3>
+        <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 20px;">
+          <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div style="width: 26px; height: 26px; background: var(--green-main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;">1</div>
+            <div style="font-size: 13.5px; color: var(--gray-600); line-height: 1.5;">Register your employer account on SkillBridge</div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div style="width: 26px; height: 26px; background: var(--green-main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;">2</div>
+            <div style="font-size: 13.5px; color: var(--gray-600); line-height: 1.5;">Submit your DTI/SEC registration and PESO accreditation documents</div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div style="width: 26px; height: 26px; background: var(--green-main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;">3</div>
+            <div style="font-size: 13.5px; color: var(--gray-600); line-height: 1.5;">Receive your Verified Employer badge within 3 to 5 business days</div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div style="width: 26px; height: 26px; background: var(--green-main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;">4</div>
+            <div style="font-size: 13.5px; color: var(--gray-600); line-height: 1.5;">Post your first listing and start receiving matched applicants</div>
+          </div>
+        </div>
+        <a href="admin.html" class="btn-primary-full" style="margin-top: 24px;">Post Your First Job Free</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">Skill<span>Bridge</span></div>
+        <p class="footer-tagline">Bridging the gap between Filipino youth and the apprenticeships they deserve.</p>
+        <div class="footer-sdg-badge">SDG 8: Decent Work &amp; Economic Growth</div>
+      </div>
+      <div class="footer-links-col">
+        <div class="footer-col-title">For Youth</div>
+        <a href="listings.html">Browse Jobs</a>
+        <a href="matches.html">My Matches</a>
+        <a href="index.html#how-it-works">How It Works</a>
+      </div>
+      <div class="footer-links-col">
+        <div class="footer-col-title">For Employers</div>
+        <a href="admin.html">Post a Job</a>
+        <a href="#plans">Pricing Plans</a>
+        <a href="#">PESO Verification</a>
+      </div>
+      <div class="footer-links-col">
+        <div class="footer-col-title">Platform</div>
+        <a href="admin.html">Admin Panel</a>
+        <a href="#">Safety Policy</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>2024 SkillBridge. BSIT IT3A — Technopreneurship. Developed by Manhic, Orlanes, and Ramos.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — SkillBridge</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&display=swap" rel="stylesheet">
+</head>
+<body class="admin-body">
+
+<nav class="navbar navbar-admin" id="mainNavbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Skill<span>Bridge</span> <span class="admin-tag">Admin</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="nav-link">View Site</a></li>
+      <li><a href="admin.html" class="nav-link active">Dashboard</a></li>
+    </ul>
+    <button class="nav-hamburger" onclick="toggleMobileNav()">&#9776;</button>
+  </div>
+</nav>
+
+<main class="admin-main">
+  <div class="admin-container">
+
+    <div class="admin-page-header">
+      <h1 class="admin-page-title">Admin Dashboard</h1>
+      <p class="admin-page-sub">Manage listings, users, and employer accounts.</p>
+    </div>
+
+    <div class="admin-stats-row">
+      <div class="admin-stat-card">
+        <div class="admin-stat-number" id="statTotalListings">50</div>
+        <div class="admin-stat-label">Total Listings</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-number" id="statActiveUsers">48</div>
+        <div class="admin-stat-label">Registered Youth</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-number" id="statVerifiedEmployers">12</div>
+        <div class="admin-stat-label">Verified Employers</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-number" id="statTotalMatches">87</div>
+        <div class="admin-stat-label">Successful Matches</div>
+      </div>
+    </div>
+
+<div class="admin-panel">
+  <div class="admin-panel-header">
+    <h2 class="admin-panel-title">XML / XSL Data Tools</h2>
+  </div>
+  <div class="import-export-row">
+    <div class="import-section">
+      <h4>Import XML</h4>
+      <p class="import-desc">Upload a listings.xml file to load records into the table.</p>
+      <input type="file" id="xmlImportFile" accept=".xml" class="file-input">
+      <button class="btn-primary-small" onclick="importXMLFile()">Import XML</button>
+      <div class="import-status" id="importStatus"></div>
+    </div>
+    <div class="export-section">
+      <h4>Export Data</h4>
+      <p class="import-desc">Download current listings as XML or CSV. Open XSL view for a formatted report.</p>
+      <button class="btn-outline-small" onclick="exportAsXML()">Export XML</button>
+      <button class="btn-outline-small" onclick="exportAsCSV()">Export CSV</button>
+      <button class="btn-outline-small" onclick="openXSLView()">&#128196; View XSL Report</button>
+    </div>
+  </div>
+</div>
+
+    <div class="admin-panel" id="listings-table">
+      <div class="admin-panel-header">
+        <h2 class="admin-panel-title">Job Listings</h2>
+     <div class="admin-panel-controls"><div class="admin-panel-controls">
+  <input type="text" class="admin-search-input" id="adminListingsSearch"
+    placeholder="Search listings..."
+    oninput="applyAdminListingsFilter()">
+  <select class="admin-search-input" id="adminFilterType" onchange="applyAdminListingsFilter()">
+    <option value="">All Types</option>
+    <option value="apprenticeship">Apprenticeship</option>
+    <option value="internship">Internship</option>
+  </select>
+  <select class="admin-search-input" id="adminFilterCity" onchange="applyAdminListingsFilter()">
+    <option value="">All Cities</option>
+    <option value="Batangas City">Batangas City</option>
+    <option value="Lipa City">Lipa City</option>
+    <option value="Calamba">Calamba</option>
+    <option value="Santa Rosa">Santa Rosa</option>
+    <option value="Antipolo">Antipolo</option>
+    <option value="Lucena">Lucena</option>
+    <option value="Tanauan">Tanauan</option>
+    <option value="Cabuyao">Cabuyao</option>
+  </select>
+  <select class="admin-search-input" id="adminFilterStatus" onchange="applyAdminListingsFilter()">
+    <option value="">All Status</option>
+    <option value="active">Active</option>
+    <option value="closed">Closed</option>
+    <option value="pending">Pending</option>
+  </select>
+  <button class="btn-primary-small" onclick="openModal('addListingModal')">+ Add</button>
+  <button class="btn-outline-small" onclick="printAdminTable('adminListingsBody','Job Listings')">&#128424; Print</button>
+</div>
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th onclick="sortTable('adminListingsBody',0)">ID</th>
+              <th onclick="sortTable('adminListingsBody',1)">Title</th>
+              <th onclick="sortTable('adminListingsBody',2)">Company</th>
+              <th onclick="sortTable('adminListingsBody',3)">Type</th>
+              <th onclick="sortTable('adminListingsBody',4)">City</th>
+              <th onclick="sortTable('adminListingsBody',5)">Allowance</th>
+              <th onclick="sortTable('adminListingsBody',6)">Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminListingsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-panel">
+      <div class="admin-panel-header">
+        <h2 class="admin-panel-title">Youth Users</h2>
+        <div class="admin-panel-controls">
+  <input type="text" class="admin-search-input" id="adminUsersSearch"
+    placeholder="Search users..."
+    oninput="applyAdminUsersFilter()">
+  <select class="admin-search-input" id="adminFilterUserCity" onchange="applyAdminUsersFilter()">
+    <option value="">All Cities</option>
+    <option value="Batangas City">Batangas City</option>
+    <option value="Lipa City">Lipa City</option>
+    <option value="Calamba">Calamba</option>
+    <option value="Santa Rosa">Santa Rosa</option>
+    <option value="Antipolo">Antipolo</option>
+    <option value="Lucena">Lucena</option>
+    <option value="Tanauan">Tanauan</option>
+    <option value="Cabuyao">Cabuyao</option>
+  </select>
+  <select class="admin-search-input" id="adminFilterVerified" onchange="applyAdminUsersFilter()">
+    <option value="">All</option>
+    <option value="verified">Verified</option>
+    <option value="pending">Pending</option>
+  </select>
+  <button class="btn-outline-small" onclick="printAdminTable('adminUsersBody','Youth Users')">&#128424; Print</button>
+</div>
+      </div>
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th onclick="sortTable('adminUsersBody',1)">Name</th>
+              <th onclick="sortTable('adminUsersBody',2)">City</th>
+              <th>Skills</th>
+              <th onclick="sortTable('adminUsersBody',4)">Verified</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminUsersBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="modal-overlay" id="addListingModal" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">Add New Listing</h3>
+      <button class="modal-close-btn" onclick="closeModal('addListingModal')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Job Title</label>
+        <input type="text" class="form-input" id="newTitle" placeholder="e.g. Electrical Apprentice">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Company</label>
+        <input type="text" class="form-input" id="newCompany" placeholder="Company name">
+      </div>
+      <div class="form-row-two">
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" id="newType">
+            <option value="apprenticeship">Apprenticeship</option>
+            <option value="internship">Internship</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input type="text" class="form-input" id="newCity" placeholder="City">
+        </div>
+      </div>
+      <div class="form-row-two">
+        <div class="form-group">
+          <label class="form-label">Allowance (&#8369;/day)</label>
+          <input type="number" class="form-input" id="newAllowance" placeholder="450">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Duration</label>
+          <input type="text" class="form-input" id="newDuration" placeholder="6 months">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Skills (comma-separated)</label>
+        <input type="text" class="form-input" id="newSkills" placeholder="Electrical Wiring, Safety Protocols">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline-small" onclick="closeModal('addListingModal')">Cancel</button>
+      <button class="btn-primary-small" onclick="saveNewListing()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+<script src="xml-loader.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

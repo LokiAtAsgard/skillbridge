@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Listings — SkillBridge</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar" id="mainNavbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Skill<span>Bridge</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="listings.html" class="nav-link active">Browse Jobs</a></li>
+      <li><a href="matches.html" class="nav-link">My Matches</a></li>
+      <li><a href="employers.html" class="nav-link">For Employers</a></li>
+      <li><a href="admin.html" class="nav-link">Admin</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="btn-outline-small">Log In</a>
+      <a href="#" class="btn-primary-small">Sign Up Free</a>
+    </div>
+    <button class="nav-hamburger" onclick="toggleMobileNav()">&#9776;</button>
+  </div>
+</nav>
+
+<div class="page-header-bar">
+  <div class="page-header-container">
+    <h1 class="page-title">Browse Apprenticeships &amp; Internships</h1>
+    <p class="page-subtitle">All listings are verified by PESO. Use swipe or click the buttons on each card.</p>
+  </div>
+</div>
+
+<main class="listings-page-main">
+  <div class="listings-page-container">
+
+    <aside class="filters-sidebar">
+      <div class="filters-header">
+        <h3>Filters</h3>
+        <button class="btn-text-small" onclick="resetAllFilters()">Reset</button>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Search</label>
+        <input type="text" class="filter-input" id="filterSearch" placeholder="Title, skill, company..." oninput="applyAllFilters()">
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Type</label>
+        <select class="filter-select-full" id="filterOpportunityType" onchange="applyAllFilters()">
+          <option value="">All Types</option>
+          <option value="apprenticeship">Apprenticeship</option>
+          <option value="internship">Internship</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">City</label>
+        <select class="filter-select-full" id="filterLocation" onchange="applyAllFilters()">
+          <option value="">All Cities</option>
+          <option value="Batangas City">Batangas City</option>
+          <option value="Lipa City">Lipa City</option>
+          <option value="Calamba">Calamba</option>
+          <option value="Santa Rosa">Santa Rosa</option>
+          <option value="Antipolo">Antipolo</option>
+          <option value="Lucena">Lucena</option>
+          <option value="Tanauan">Tanauan</option>
+          <option value="Cabuyao">Cabuyao</option>
+          <option value="Santo Tomas">Santo Tomas</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Industry</label>
+        <select class="filter-select-full" id="filterIndustry" onchange="applyAllFilters()">
+          <option value="">All Industries</option>
+          <option value="electrical">Electrical</option>
+          <option value="automotive">Automotive</option>
+          <option value="construction">Construction</option>
+          <option value="it">Information Technology</option>
+          <option value="food">Food Service</option>
+          <option value="manufacturing">Manufacturing</option>
+          <option value="retail">Retail</option>
+          <option value="healthcare">Healthcare</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Min Allowance (&#8369;/day)</label>
+        <select class="filter-select-full" id="filterAllowance" onchange="applyAllFilters()">
+          <option value="">Any Amount</option>
+          <option value="300">300+</option>
+          <option value="400">400+</option>
+          <option value="500">500+</option>
+          <option value="600">600+</option>
+        </select>
+      </div>
+      <button class="btn-primary-full" onclick="applyAllFilters()">Apply Filters</button>
+      <button class="btn-outline-full" onclick="window.print()">&#128424; Print Results</button>
+    </aside>
+
+    <div class="listings-main-area">
+      <div class="listings-controls-bar">
+        <div class="results-count-label" id="resultsCountLabel">Loading...</div>
+        <div class="view-mode-toggle">
+          <button class="view-mode-btn is-active" id="btnListView" onclick="switchToListView()">&#9776; List</button>
+          <button class="view-mode-btn" id="btnSwipeView" onclick="switchToSwipeView()">&#8660; Swipe</button>
+        </div>
+        <select class="filter-select" id="sortOrder" onchange="applyAllFilters()">
+          <option value="match">Best Match</option>
+          <option value="newest">Newest First</option>
+          <option value="allowance">Highest Allowance</option>
+        </select>
+      </div>
+
+      <div id="listViewArea">
+        <div class="job-cards-grid" id="jobCardsGrid">
+          <div class="loading-placeholder">Loading listings...</div>
+        </div>
+      </div>
+
+      <div id="swipeViewArea" style="display:none;">
+        <div class="swipe-instructions">
+          <span class="swipe-inst-item up-color">&#8593; Up = Interested</span>
+          <span class="swipe-inst-item down-color">&#8595; Down = Pass</span>
+          <span class="swipe-inst-item right-color">&#8594; Right = Bookmark</span>
+          <span class="swipe-inst-item left-color">&#8592; Left = Undo</span>
+        </div>
+        <div class="swipe-deck-wrap" id="swipeDeckWrap"></div>
+        <div class="swipe-deck-buttons">
+          <button class="swipe-deck-btn btn-undo"     onclick="triggerDeckSwipe('left')"  title="Undo">&#8592;</button>
+          <button class="swipe-deck-btn btn-pass"     onclick="triggerDeckSwipe('down')"  title="Pass">&#8595;</button>
+          <button class="swipe-deck-btn btn-interest" onclick="triggerDeckSwipe('up')"    title="Interested">&#8593;</button>
+          <button class="swipe-deck-btn btn-bookmark" onclick="triggerDeckSwipe('right')" title="Bookmark">&#128278;</button>
+        </div>
+        <div class="swipe-progress" id="swipeProgress"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-bottom">
+      <p>2024 SkillBridge. BSIT IT3A — Technopreneurship.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+<script src="xml-loader.js"></script>
+<script src="listings.js"></script>
+</body>
+</html>
