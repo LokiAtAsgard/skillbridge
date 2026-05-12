@@ -1,19 +1,21 @@
-var allLoadedListings    = [];
-var currentViewMode      = 'list';
-var swipeFrontCardIndex  = 0;
+var allLoadedListings   = [];
+var currentViewMode     = 'list';
+var swipeCurrentListings= [];
+var swipeFrontIdx       = 0;
+var swipeHistory        = [];
 
-var dragStartX     = 0;
-var dragStartY     = 0;
-var currentDragX   = 0;
-var currentDragY   = 0;
-var isDraggingCard = false;
-
+var dragStartX   = 0, dragStartY = 0;
+var currentDragX = 0, currentDragY = 0;
+var isDragging   = false;
 var SWIPE_THRESHOLD = 55;
 var TILT_FACTOR     = 0.05;
 
 window.addEventListener('DOMContentLoaded', function() {
-  loadXMLListings(function(loadedListings) {
-    allLoadedListings = loadedListings;
+  var passed = JSON.parse(localStorage.getItem('sb_passed') || '[]');
+  loadXMLListings(function(listings) {
+    allLoadedListings = listings.filter(function(l) {
+      return !passed.includes(String(l.id));
+    });
     renderListingCards(allLoadedListings, 'jobCardsGrid');
     updateResultsCount(allLoadedListings.length);
     buildSwipeDeck(allLoadedListings);
@@ -21,49 +23,46 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 function applyAllFilters() {
-  var searchText       = document.getElementById('filterSearch').value;
-  var typeFilter       = document.getElementById('filterOpportunityType').value;
-  var cityFilter       = document.getElementById('filterLocation').value;
-  var industryFilter   = document.getElementById('filterIndustry').value;
-  var allowanceFilter  = document.getElementById('filterAllowance').value;
-  var sortOrderValue   = document.getElementById('sortOrder').value;
+  var searchText      = document.getElementById('filterSearch').value;
+  var typeFilter      = document.getElementById('filterOpportunityType').value;
+  var cityFilter      = document.getElementById('filterLocation').value;
+  var industryFilter  = document.getElementById('filterIndustry').value;
+  var allowanceFilter = document.getElementById('filterAllowance').value;
+  var sortOrder       = document.getElementById('sortOrder').value;
+  var passed          = JSON.parse(localStorage.getItem('sb_passed') || '[]');
 
-  var filteredListings = applyListingFilters(allLoadedListings, searchText, typeFilter, cityFilter, industryFilter, allowanceFilter);
+  var filtered = applyListingFilters(allLoadedListings, searchText, typeFilter, cityFilter, industryFilter, allowanceFilter);
+  filtered = filtered.filter(function(l) { return !passed.includes(String(l.id)); });
 
-  if (sortOrderValue === 'allowance') {
-    filteredListings.sort(function(listingA, listingB) {
-      return parseInt(listingB.allowance) - parseInt(listingA.allowance);
-    });
-  } else if (sortOrderValue === 'newest') {
-    filteredListings.sort(function(listingA, listingB) {
-      return new Date(listingB.posted) - new Date(listingA.posted);
-    });
+  if (sortOrder === 'allowance') {
+    filtered.sort(function(a, b) { return parseInt(b.allowance) - parseInt(a.allowance); });
+  } else if (sortOrder === 'newest') {
+    filtered.sort(function(a, b) { return new Date(b.posted) - new Date(a.posted); });
   }
 
-  renderListingCards(filteredListings, 'jobCardsGrid');
-  updateResultsCount(filteredListings.length);
-  buildSwipeDeck(filteredListings);
-
-  if (filteredListings.length === 0) {
-    showNoMatchesDialog();
-  }
+  renderListingCards(filtered, 'jobCardsGrid');
+  updateResultsCount(filtered.length);
+  buildSwipeDeck(filtered);
+  if (filtered.length === 0) showNoMatchesDialog();
 }
 
 function resetAllFilters() {
-  document.getElementById('filterSearch').value          = '';
-  document.getElementById('filterOpportunityType').value = '';
-  document.getElementById('filterLocation').value        = '';
-  document.getElementById('filterIndustry').value        = '';
-  document.getElementById('filterAllowance').value       = '';
-  document.getElementById('sortOrder').value             = 'match';
-  renderListingCards(allLoadedListings, 'jobCardsGrid');
-  updateResultsCount(allLoadedListings.length);
-  buildSwipeDeck(allLoadedListings);
+  document.getElementById('filterSearch').value           = '';
+  document.getElementById('filterOpportunityType').value  = '';
+  document.getElementById('filterLocation').value         = '';
+  document.getElementById('filterIndustry').value         = '';
+  document.getElementById('filterAllowance').value        = '';
+  document.getElementById('sortOrder').value              = 'match';
+  var passed = JSON.parse(localStorage.getItem('sb_passed') || '[]');
+  var visible = allLoadedListings.filter(function(l) { return !passed.includes(String(l.id)); });
+  renderListingCards(visible, 'jobCardsGrid');
+  updateResultsCount(visible.length);
+  buildSwipeDeck(visible);
 }
 
-function updateResultsCount(totalCount) {
-  var countLabel = document.getElementById('resultsCountLabel');
-  if (countLabel) countLabel.textContent = totalCount + ' listing' + (totalCount !== 1 ? 's' : '') + ' found';
+function updateResultsCount(n) {
+  var el = document.getElementById('resultsCountLabel');
+  if (el) el.textContent = n + ' listing' + (n !== 1 ? 's' : '') + ' found';
 }
 
 function switchToListView() {
@@ -82,55 +81,60 @@ function switchToSwipeView() {
   document.getElementById('btnSwipeView').classList.add('is-active');
 }
 
-function buildSwipeDeck(listingsForDeck) {
-  var deckWrapper = document.getElementById('swipeDeckWrap');
-  if (!deckWrapper) return;
-  swipeFrontCardIndex = 0;
-  deckWrapper.innerHTML = '';
-  if (listingsForDeck.length === 0) {
-    deckWrapper.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca39c;">No cards to show.</div>';
+// ── SWIPE DECK (index-based) ────────────────────────────────────────────
+function buildSwipeDeck(listings) {
+  swipeCurrentListings = listings;
+  swipeFrontIdx        = 0;
+  swipeHistory         = [];
+  renderSwipeDeck();
+}
+
+function renderSwipeDeck() {
+  var wrap = document.getElementById('swipeDeckWrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  if (!swipeCurrentListings.length || swipeFrontIdx >= swipeCurrentListings.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#9ca39c;"><div style="font-size:48px;margin-bottom:12px;">✅</div><div>No more cards in this view.</div></div>';
+    updateSwipeProgress(swipeFrontIdx, swipeCurrentListings.length);
     return;
   }
 
-  var maxCardsToRender = Math.min(listingsForDeck.length, 3);
-  for (var cardIndex = maxCardsToRender - 1; cardIndex >= 0; cardIndex--) {
-    var swipeCardElement  = document.createElement('div');
-    swipeCardElement.className = 'swipe-card-item ' + getStackClass(cardIndex);
-    swipeCardElement.id        = 'swipeCard_' + cardIndex;
-    swipeCardElement.innerHTML = buildSwipeCardHTML(listingsForDeck[cardIndex]);
-    deckWrapper.appendChild(swipeCardElement);
+  var remaining  = swipeCurrentListings.length - swipeFrontIdx;
+  var cardCount  = Math.min(3, remaining);
+
+  for (var i = cardCount - 1; i >= 0; i--) {
+    var listing = swipeCurrentListings[swipeFrontIdx + i];
+    var card    = document.createElement('div');
+    card.className = 'swipe-card-item ' + ['stack-front','stack-middle','stack-back'][i];
+    card.id        = 'swipeCard_' + i;
+    card.innerHTML = buildSwipeCardHTML(listing);
+    wrap.appendChild(card);
   }
-
-  attachSwipeListeners(listingsForDeck);
-  updateSwipeProgress(swipeFrontCardIndex, listingsForDeck.length);
+  attachSwipeListeners();
+  updateSwipeProgress(swipeFrontIdx, swipeCurrentListings.length);
 }
 
-function getStackClass(cardIndexInStack) {
-  if (cardIndexInStack === 0) return 'stack-front';
-  if (cardIndexInStack === 1) return 'stack-middle';
-  return 'stack-back';
-}
-
-function buildSwipeCardHTML(listingItem) {
-  var skillTagsHTML = listingItem.skills.split(',').map(function(skillName) {
-    return '<span class="card-skill-tag">' + skillName.trim() + '</span>';
+function buildSwipeCardHTML(item) {
+  var skillsHTML = item.skills.split(',').map(function(s) {
+    return '<span class="card-skill-tag">' + s.trim() + '</span>';
   }).join('');
-  var typeBadgeClass = listingItem.type === 'internship' ? 'card-type-badge internship-badge' : 'card-type-badge';
+  var typeCls = item.type === 'internship' ? 'card-type-badge internship-badge' : 'card-type-badge';
   return '<div class="swipe-hint swipe-hint-yes"  id="hintYes">&#8593; YES</div>' +
     '<div class="swipe-hint swipe-hint-no"   id="hintNo">&#8595; NO</div>' +
     '<div class="swipe-hint swipe-hint-bookmark" id="hintSave">&#8594; SAVE</div>' +
     '<div class="swipe-hint swipe-hint-undo" id="hintUndo">&#8592; UNDO</div>' +
-    '<div class="card-banner-area">' + listingItem.icon +
-    (listingItem.verified === 'true' ? '<span class="card-verified-tag">&#10003; PESO</span>' : '') + '</div>' +
+    '<div class="card-banner-area">' + item.icon +
+    (item.verified === 'true' ? '<span class="card-verified-tag">&#10003; PESO</span>' : '') + '</div>' +
     '<div class="card-body-area">' +
-    '<span class="' + typeBadgeClass + '">' + listingItem.type + '</span>' +
-    '<div class="card-company">' + listingItem.company + '</div>' +
-    '<div class="card-title">' + listingItem.title + '</div>' +
-    '<div class="card-location">&#128205; ' + listingItem.city + '</div>' +
-    '<div class="card-skills">' + skillTagsHTML + '</div>' +
+    '<span class="' + typeCls + '">' + item.type + '</span>' +
+    '<div class="card-company">' + item.company + '</div>' +
+    '<div class="card-title">' + item.title + '</div>' +
+    '<div class="card-location">&#128205; ' + item.city + '</div>' +
+    '<div class="card-skills">' + skillsHTML + '</div>' +
     '<div class="card-stats">' +
-    '<div><div class="card-stat-val">' + formatCurrency(listingItem.allowance) + '</div><div class="card-stat-key">Per Day</div></div>' +
-    '<div><div class="card-stat-val">' + listingItem.duration + '</div><div class="card-stat-key">Duration</div></div>' +
+    '<div><div class="card-stat-val">' + formatCurrency(item.allowance) + '</div><div class="card-stat-key">Per Day</div></div>' +
+    '<div><div class="card-stat-val">' + item.duration + '</div><div class="card-stat-key">Duration</div></div>' +
     '</div></div>' +
     '<div class="card-action-row">' +
     '<button class="card-act-btn card-act-no"   onclick="triggerDeckSwipe(\'down\')">&#8595; Pass</button>' +
@@ -139,157 +143,208 @@ function buildSwipeCardHTML(listingItem) {
     '</div>';
 }
 
-function attachSwipeListeners(listingsForDeck) {
-  var frontCard = document.querySelector('.swipe-card-item.stack-front');
-  if (!frontCard) return;
+function attachSwipeListeners() {
+  var front = document.querySelector('.swipe-card-item.stack-front');
+  if (!front) return;
 
-  frontCard.addEventListener('mousedown', function(mouseEvent) {
-    isDraggingCard = true;
-    dragStartX     = mouseEvent.clientX;
-    dragStartY     = mouseEvent.clientY;
-    frontCard.style.transition = '';
+  front.addEventListener('mousedown', function(e) {
+    isDragging = true; dragStartX = e.clientX; dragStartY = e.clientY;
+    front.style.transition = '';
   });
+  document.addEventListener('mousemove', onDragMove);
+  document.addEventListener('mouseup',   onDragEnd);
 
-  document.addEventListener('mousemove', function(mouseMoveEvent) {
-    if (!isDraggingCard) return;
-    currentDragX = mouseMoveEvent.clientX - dragStartX;
-    currentDragY = mouseMoveEvent.clientY - dragStartY;
-    var cardRotation = currentDragX * TILT_FACTOR;
-    frontCard.style.transform = 'translate(' + currentDragX + 'px,' + currentDragY + 'px) rotate(' + cardRotation + 'deg)';
-    updateDragHints(currentDragX, currentDragY, frontCard);
-  });
-
-  document.addEventListener('mouseup', function() {
-    if (!isDraggingCard) return;
-    isDraggingCard = false;
-    hideAllHints(frontCard);
-    var dominantDirection = getDominantDirection(currentDragX, currentDragY);
-    var dragMagnitude     = Math.max(Math.abs(currentDragX), Math.abs(currentDragY));
-    if (dragMagnitude >= SWIPE_THRESHOLD) {
-      triggerDeckSwipe(dominantDirection);
-    } else {
-      resetFrontCardPosition(frontCard);
-    }
-  });
-
-  frontCard.addEventListener('touchstart', function(touchEvent) {
-    isDraggingCard = true;
-    dragStartX     = touchEvent.touches[0].clientX;
-    dragStartY     = touchEvent.touches[0].clientY;
-    frontCard.style.transition = '';
+  front.addEventListener('touchstart', function(e) {
+    isDragging = true; dragStartX = e.touches[0].clientX; dragStartY = e.touches[0].clientY;
+    front.style.transition = '';
   }, { passive: true });
+  document.addEventListener('touchmove', onTouchMove, { passive: true });
+  document.addEventListener('touchend',  onDragEnd);
 
-  document.addEventListener('touchmove', function(touchMoveEvent) {
-    if (!isDraggingCard) return;
-    currentDragX = touchMoveEvent.touches[0].clientX - dragStartX;
-    currentDragY = touchMoveEvent.touches[0].clientY - dragStartY;
-    var cardRotation = currentDragX * TILT_FACTOR;
-    frontCard.style.transform = 'translate(' + currentDragX + 'px,' + currentDragY + 'px) rotate(' + cardRotation + 'deg)';
-    updateDragHints(currentDragX, currentDragY, frontCard);
-  }, { passive: true });
-
-  document.addEventListener('touchend', function() {
-    if (!isDraggingCard) return;
-    isDraggingCard = false;
-    hideAllHints(frontCard);
-    var dominantDirection = getDominantDirection(currentDragX, currentDragY);
-    var dragMagnitude     = Math.max(Math.abs(currentDragX), Math.abs(currentDragY));
-    if (dragMagnitude >= SWIPE_THRESHOLD) {
-      triggerDeckSwipe(dominantDirection);
+  function onDragMove(e) {
+    if (!isDragging) return;
+    currentDragX = e.clientX - dragStartX;
+    currentDragY = e.clientY - dragStartY;
+    front.style.transform = 'translate(' + currentDragX + 'px,' + currentDragY + 'px) rotate(' + (currentDragX * TILT_FACTOR) + 'deg)';
+    updateDragHints(currentDragX, currentDragY, front);
+  }
+  function onTouchMove(e) {
+    if (!isDragging) return;
+    currentDragX = e.touches[0].clientX - dragStartX;
+    currentDragY = e.touches[0].clientY - dragStartY;
+    front.style.transform = 'translate(' + currentDragX + 'px,' + currentDragY + 'px) rotate(' + (currentDragX * TILT_FACTOR) + 'deg)';
+    updateDragHints(currentDragX, currentDragY, front);
+  }
+  function onDragEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    document.removeEventListener('mousemove', onDragMove);
+    document.removeEventListener('mouseup',   onDragEnd);
+    document.removeEventListener('touchmove', onTouchMove);
+    document.removeEventListener('touchend',  onDragEnd);
+    hideAllHints(front);
+    var dir  = getDominantDirection(currentDragX, currentDragY);
+    var dist = Math.max(Math.abs(currentDragX), Math.abs(currentDragY));
+    if (dist >= SWIPE_THRESHOLD) {
+      triggerDeckSwipe(dir);
     } else {
-      resetFrontCardPosition(frontCard);
+      front.style.transition = 'transform .3s ease';
+      front.style.transform  = '';
+      setTimeout(function() { front.style.transition = ''; }, 320);
     }
+  }
+}
+
+function getDominantDirection(dx, dy) {
+  return Math.abs(dx) > Math.abs(dy)
+    ? (dx > 0 ? 'right' : 'left')
+    : (dy > 0 ? 'down' : 'up');
+}
+
+function updateDragHints(dx, dy, card) {
+  var dir     = getDominantDirection(dx, dy);
+  var dist    = Math.max(Math.abs(dx), Math.abs(dy));
+  var opacity = Math.max(0, Math.min((dist - 20) / 40, 1));
+  var map = { up:'#hintYes', down:'#hintNo', right:'#hintSave', left:'#hintUndo' };
+  ['#hintYes','#hintNo','#hintSave','#hintUndo'].forEach(function(sel) {
+    var el = card.querySelector(sel);
+    if (el) el.style.opacity = (map[dir] === sel) ? opacity : 0;
   });
 }
 
-function getDominantDirection(deltaX, deltaY) {
-  var absX = Math.abs(deltaX);
-  var absY = Math.abs(deltaY);
-  if (absX > absY) return deltaX > 0 ? 'right' : 'left';
-  return deltaY > 0 ? 'down' : 'up';
-}
-
-function updateDragHints(deltaX, deltaY, cardElement) {
-  var dominantDir  = getDominantDirection(deltaX, deltaY);
-  var dragDistance = Math.max(Math.abs(deltaX), Math.abs(deltaY));
-  var hintOpacity  = Math.max(0, Math.min((dragDistance - 20) / 40, 1));
-
-  var hintYes  = cardElement.querySelector('#hintYes');
-  var hintNo   = cardElement.querySelector('#hintNo');
-  var hintSave = cardElement.querySelector('#hintSave');
-  var hintUndo = cardElement.querySelector('#hintUndo');
-
-  if (hintYes)  hintYes.style.opacity  = dominantDir === 'up'    ? hintOpacity : 0;
-  if (hintNo)   hintNo.style.opacity   = dominantDir === 'down'  ? hintOpacity : 0;
-  if (hintSave) hintSave.style.opacity = dominantDir === 'right' ? hintOpacity : 0;
-  if (hintUndo) hintUndo.style.opacity = dominantDir === 'left'  ? hintOpacity : 0;
-}
-
-function hideAllHints(cardElement) {
-  ['#hintYes','#hintNo','#hintSave','#hintUndo'].forEach(function(hintSelector) {
-    var hintElement = cardElement.querySelector(hintSelector);
-    if (hintElement) hintElement.style.opacity = 0;
+function hideAllHints(card) {
+  ['#hintYes','#hintNo','#hintSave','#hintUndo'].forEach(function(sel) {
+    var el = card.querySelector(sel);
+    if (el) el.style.opacity = 0;
   });
 }
 
-function resetFrontCardPosition(cardElement) {
-  cardElement.style.transition = 'transform .3s ease';
-  cardElement.style.transform  = '';
-  setTimeout(function() { cardElement.style.transition = ''; }, 320);
-}
-
-function triggerDeckSwipe(swipeDirection) {
-  var frontCard = document.querySelector('.swipe-card-item.stack-front');
-  if (!frontCard) return;
-
-  if (swipeDirection === 'up') {
-    animateSwipeExit(frontCard, 0, -400, 0, function() { showToast('Interested! Waiting for employer match.'); });
-  } else if (swipeDirection === 'down') {
-    animateSwipeExit(frontCard, 0, 500, 0, function() { showToast('Passed.', 'warn'); });
-  } else if (swipeDirection === 'right') {
-    animateSwipeExit(frontCard, 400, -40, 15, function() { showToast('Bookmarked for later.'); });
-  } else if (swipeDirection === 'left') {
-    frontCard.style.transition = 'transform .25s ease';
-    frontCard.style.transform  = 'translateX(-60px) rotate(-5deg)';
-    setTimeout(function() {
-      frontCard.style.transform = '';
-      setTimeout(function() { frontCard.style.transition = ''; }, 200);
-    }, 250);
-    showToast('Undone.');
+function triggerDeckSwipe(direction) {
+  // UNDO — restore last dismissed card
+  if (direction === 'left') {
+    if (swipeFrontIdx > 0 && swipeHistory.length > 0) {
+      var last = swipeHistory.pop();
+      swipeFrontIdx--;
+      // Undo pass from localStorage
+      if (last.action === 'pass') {
+        var passed = JSON.parse(localStorage.getItem('sb_passed') || '[]');
+        passed = passed.filter(function(id) { return id !== String(last.listingId); });
+        localStorage.setItem('sb_passed', JSON.stringify(passed));
+      }
+      renderSwipeDeck();
+      showToast('Undone!');
+    } else {
+      // Bounce animation if nothing to undo
+      var front = document.querySelector('.swipe-card-item.stack-front');
+      if (front) {
+        front.style.transition = 'transform .25s ease';
+        front.style.transform  = 'translateX(-50px) rotate(-5deg)';
+        setTimeout(function() {
+          front.style.transform = '';
+          setTimeout(function() { front.style.transition = ''; }, 250);
+        }, 250);
+      }
+      showToast('Nothing to undo.', 'warn');
+    }
     return;
   }
-}
 
-function animateSwipeExit(cardElement, exitX, exitY, exitRotation, onCompleteCallback) {
-  cardElement.style.transition = 'transform .38s ease, opacity .38s ease';
-  cardElement.style.transform  = 'translate(' + exitX + 'px,' + exitY + 'px) rotate(' + exitRotation + 'deg)';
-  cardElement.style.opacity    = '0';
-  setTimeout(function() {
-    cardElement.remove();
-    var nextCard = document.querySelector('.swipe-card-item.stack-middle');
-    if (nextCard) {
-      nextCard.className = 'swipe-card-item stack-front';
-      nextCard.style.transition = 'transform .3s ease';
-      nextCard.style.transform  = '';
-      setTimeout(function() { nextCard.style.transition = ''; }, 320);
-    }
-    var backCard = document.querySelector('.swipe-card-item.stack-back');
-    if (backCard) {
-      backCard.className = 'swipe-card-item stack-middle';
-      backCard.style.transition = 'transform .3s ease';
-      setTimeout(function() { backCard.style.transition = ''; }, 320);
-    }
-    swipeFrontCardIndex++;
-    if (typeof allLoadedListings !== 'undefined') {
-      updateSwipeProgress(swipeFrontCardIndex, allLoadedListings.length);
-    }
-    if (onCompleteCallback) onCompleteCallback();
-  }, 400);
-}
+  var front = document.querySelector('.swipe-card-item.stack-front');
+  if (!front || swipeFrontIdx >= swipeCurrentListings.length) return;
 
-function updateSwipeProgress(currentIndex, totalCount) {
-  var progressLabel = document.getElementById('swipeProgress');
-  if (progressLabel) {
-    progressLabel.textContent = 'Card ' + (currentIndex + 1) + ' of ' + totalCount;
+  var listing = swipeCurrentListings[swipeFrontIdx];
+
+  if (direction === 'up') {
+    doCardAction('yes', listing);
+    swipeHistory.push({ action: 'yes', listingId: listing.id });
+    animateExit(front, 0, -450, 0, function() { swipeFrontIdx++; renderSwipeDeck(); });
+  } else if (direction === 'down') {
+    doCardAction('pass', listing);
+    swipeHistory.push({ action: 'pass', listingId: listing.id });
+    animateExit(front, 0, 520, 0, function() { swipeFrontIdx++; renderSwipeDeck(); });
+  } else if (direction === 'right') {
+    doCardAction('save', listing);
+    swipeHistory.push({ action: 'save', listingId: listing.id });
+    animateExit(front, 420, -40, 15, function() { swipeFrontIdx++; renderSwipeDeck(); });
   }
+}
+
+function animateExit(card, x, y, rot, cb) {
+  card.style.transition = 'transform .38s ease, opacity .38s ease';
+  card.style.transform  = 'translate(' + x + 'px,' + y + 'px) rotate(' + rot + 'deg)';
+  card.style.opacity    = '0';
+  setTimeout(function() { card.remove(); if (cb) cb(); }, 400);
+}
+
+function updateSwipeProgress(idx, total) {
+  var el = document.getElementById('swipeProgress');
+  if (el) el.textContent = (idx < total) ? 'Card ' + (idx + 1) + ' of ' + total : 'All cards viewed';
+}
+
+// ── CARD ACTIONS (list view + swipe share this) ─────────────────────────
+function doCardAction(actionType, listing) {
+  var listingId = listing.id;
+  var session   = JSON.parse(localStorage.getItem('sb_session') || 'null');
+
+  if (actionType === 'yes') {
+    if (!session || !session.access_token) {
+      showToast('Please log in to express interest.', 'warn');
+      setTimeout(function() { window.location.href = 'login.html'; }, 1500);
+      return;
+    }
+    var matches = JSON.parse(localStorage.getItem('sb_local_matches') || '[]');
+    var exists  = matches.find(function(m) { return String(m.listing.id) === String(listingId); });
+    if (!exists) {
+      matches.push({ id: 'match_' + Date.now(), listing: listing, timestamp: new Date().toISOString() });
+      localStorage.setItem('sb_local_matches', JSON.stringify(matches));
+    }
+    showToast('Interested! Check My Matches.');
+
+  } else if (actionType === 'save') {
+    var bookmarks = JSON.parse(localStorage.getItem('sb_bookmarks_full') || '[]');
+    var bExists   = bookmarks.find(function(b) { return String(b.id) === String(listingId); });
+    if (!bExists) {
+      bookmarks.push(listing);
+      localStorage.setItem('sb_bookmarks_full', JSON.stringify(bookmarks));
+      showToast('Bookmarked! View in My Matches.');
+    } else {
+      bookmarks = bookmarks.filter(function(b) { return String(b.id) !== String(listingId); });
+      localStorage.setItem('sb_bookmarks_full', JSON.stringify(bookmarks));
+      showToast('Removed from bookmarks.', 'warn');
+    }
+
+  } else if (actionType === 'pass') {
+    var passed = JSON.parse(localStorage.getItem('sb_passed') || '[]');
+    if (!passed.includes(String(listingId))) {
+      passed.push(String(listingId));
+      localStorage.setItem('sb_passed', JSON.stringify(passed));
+    }
+    showToast('Passed.', 'warn');
+    // Remove from list view
+    var card = document.querySelector('[data-id="' + listingId + '"]');
+    if (card) {
+      card.style.transition = 'opacity .3s, transform .3s';
+      card.style.opacity    = '0';
+      card.style.transform  = 'translateX(-20px)';
+      setTimeout(function() { if (card.parentNode) card.parentNode.removeChild(card); }, 300);
+    }
+  }
+}
+
+// Called from list view card buttons
+function handleCardAction(actionType, listingId) {
+  var listing = (cachedListingsData || allLoadedListings || []).find(function(l) {
+    return String(l.id) === String(listingId);
+  });
+  if (listing) doCardAction(actionType, listing);
+}
+
+// ── UNDO for list view ─────────────────────────────────────────────────
+function undoLastPass() {
+  var passed = JSON.parse(localStorage.getItem('sb_passed') || '[]');
+  if (!passed.length) { showToast('Nothing to undo.', 'warn'); return; }
+  passed.pop();
+  localStorage.setItem('sb_passed', JSON.stringify(passed));
+  applyAllFilters();
+  showToast('Last pass undone!');
 }

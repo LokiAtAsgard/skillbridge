@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skillbridge>
+  <listings>
+    <listing id="101">
+      <title>Android Developer Intern</title>
+      <company>DigiPinas Inc.</company>
+      <type>internship</type>
+      <industry>it</industry>
+      <city>Santa Rosa</city>
+      <allowance>600</allowance>
+      <duration>3 months</duration>
+      <slots>2</slots>
+      <skills>Android Studio, Java, REST APIs</skills>
+      <verified>true</verified>
+      <featured>false</featured>
+      <status>active</status>
+      <posted>2024-12-01</posted>
+      <icon>📱</icon>
+    </listing>
+    <listing id="102">
+      <title>Cybersecurity Intern</title>
+      <company>NetDefense PH</company>
+      <type>internship</type>
+      <industry>it</industry>
+      <city>Calamba</city>
+      <allowance>580</allowance>
+      <duration>3 months</duration>
+      <slots>1</slots>
+      <skills>Network Security, Linux, Penetration Testing</skills>
+      <verified>true</verified>
+      <featured>false</featured>
+      <status>active</status>
+      <posted>2024-12-05</posted>
+      <icon>🔐</icon>
+    </listing>
+    <listing id="103">
+      <title>Database Administrator Intern</title>
+      <company>DataCore Solutions</company>
+      <type>internship</type>
+      <industry>it</industry>
+      <city>Antipolo</city>
+      <allowance>550</allowance>
+      <duration>3 months</duration>
+      <slots>2</slots>
+      <skills>MySQL, PostgreSQL, Database Design</skills>
+      <verified>true</verified>
+      <featured>false</featured>
+      <status>active</status>
+      <posted>2024-12-08</posted>
+      <icon>🗄️</icon>
+    </listing>
+    <listing id="104">
+      <title>Cloud Computing Intern</title>
+      <company>CloudPH Solutions</company>
+      <type>internship</type>
+      <industry>it</industry>
+      <city>Santa Rosa</city>
+      <allowance>620</allowance>
+      <duration>3 months</duration>
+      <slots>2</slots>
+      <skills>AWS, Azure, Docker, Linux</skills>
+      <verified>true</verified>
+      <featured>false</featured>
+      <status>active</status>
+      <posted>2024-12-10</posted>
+      <icon>☁️</icon>
+    </listing>
+    <listing id="105">
+      <title>Mobile App Developer Intern</title>
+      <company>AppWorks PH</company>
+      <type>internship</type>
+      <industry>it</industry>
+      <city>Calamba</city>
+      <allowance>590</allowance>
+      <duration>3 months</duration>
+      <slots>3</slots>
+      <skills>Flutter, Dart, Firebase</skills>
+      <verified>true</verified>
+      <featured>false</featured>
+      <status>active</status>
+      <posted>2024-12-12</posted>
+      <icon>💻</icon>
+    </listing>
+  </listings>
+</skillbridge>

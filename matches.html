@@ -7,16 +7,20 @@
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&display=swap" rel="stylesheet">
   <style>
-    .match-card{background:var(--white);border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:16px;}
-    .match-card.is-matched{border:2px solid var(--green-main);}
-    .chat-box{background:var(--surface);border-radius:10px;padding:16px;margin-top:16px;max-height:300px;overflow-y:auto;}
-    .msg-row{margin-bottom:12px;}
-    .msg-bubble{display:inline-block;padding:8px 14px;border-radius:12px;font-size:14px;max-width:80%;}
-    .msg-mine{background:var(--green-main);color:#fff;float:right;clear:both;}
-    .msg-theirs{background:#e5e7eb;color:var(--text-primary);float:left;clear:both;}
+    .match-card{background:var(--white);border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:16px;border:1.5px solid var(--border);}
+    .match-card.is-matched{border-color:var(--green-main);}
+    .chat-box{background:var(--surface);border-radius:10px;padding:16px;margin-top:14px;max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
+    .msg-row{display:flex;flex-direction:column;}
+    .msg-row.mine{align-items:flex-end;}
+    .msg-row.theirs{align-items:flex-start;}
     .msg-sender{font-size:11px;color:var(--text-muted);margin-bottom:3px;}
-    .interview-bubble{background:#fef9c3;border:1px solid #fbbf24;border-radius:10px;padding:12px 16px;margin-top:12px;font-size:13px;}
-    .clearfix::after{content:'';display:block;clear:both;}
+    .msg-bubble{padding:9px 14px;border-radius:12px;font-size:14px;max-width:80%;line-height:1.5;}
+    .msg-mine{background:var(--green-main);color:#fff;}
+    .msg-theirs{background:#e5e7eb;color:var(--text-primary);}
+    .msg-time{font-size:11px;color:var(--text-muted);margin-top:3px;}
+    .interview-card{background:#fef9c3;border:1px solid #fbbf24;border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.6;}
+    .bookmark-card{background:var(--white);border:1.5px solid #fbbf24;border-radius:12px;padding:18px;margin-bottom:12px;}
+    .section-title-bar{font-size:18px;font-weight:700;color:var(--text-primary);margin:32px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--border);}
   </style>
 </head>
 <body>
@@ -28,6 +32,7 @@
       <li><a href="listings.html" class="nav-link">Browse Jobs</a></li>
       <li><a href="matches.html" class="nav-link active">My Matches</a></li>
       <li><a href="employers.html" class="nav-link">For Employers</a></li>
+      <li><a href="admin.html" class="nav-link">Admin</a></li>
     </ul>
     <div class="nav-actions" id="navActions"></div>
     <button class="nav-hamburger" onclick="toggleMobileNav()">&#9776;</button>
@@ -37,46 +42,69 @@
 <div class="page-header-bar">
   <div class="page-header-container">
     <h1 class="page-title">My Matches</h1>
-    <p class="page-subtitle" id="matchSubtitle">Loading...</p>
+    <p class="page-subtitle" id="pageSubtitle">Loading...</p>
   </div>
 </div>
 
 <main style="padding:48px 0 80px;background:var(--surface);min-height:60vh;">
-  <div style="max-width:760px;margin:0 auto;padding:0 24px;">
+  <div style="max-width:800px;margin:0 auto;padding:0 24px;">
+
     <div id="notLoggedIn" style="display:none;text-align:center;padding:80px 24px;">
       <div style="font-size:56px;margin-bottom:20px;">🔒</div>
-      <h2 style="font-family:'DM Sans',sans-serif;font-size:24px;color:var(--text-primary);margin-bottom:12px;">Log in to see your matches</h2>
-      <p style="color:var(--text-muted);max-width:400px;margin:0 auto 28px;">Create a profile, swipe on listings, and matches will appear here.</p>
-      <div style="display:flex;gap:12px;justify-content:center;">
+      <h2 style="font-size:24px;font-weight:700;margin-bottom:12px;">Log in to see your matches</h2>
+      <p style="color:var(--text-muted);max-width:400px;margin:0 auto 28px;">Create a profile, browse listings, and swipe up on ones you like.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
         <a href="listings.html" class="btn-primary-large">Browse Listings</a>
         <a href="login.html" class="btn-outline-large">Log In</a>
       </div>
     </div>
-    <div id="matchesList"></div>
+
+    <div id="mainContent" style="display:none;">
+
+      <!-- EMPLOYER: Posted Jobs -->
+      <div id="postedJobsSection" style="display:none;">
+        <div class="section-title-bar">&#128188; My Posted Jobs</div>
+        <div id="postedJobsList"></div>
+        <a href="employers.html" class="btn-outline-small" style="display:inline-block;margin-bottom:8px;">+ Post Another Job</a>
+      </div>
+
+      <!-- MATCHES -->
+      <div class="section-title-bar" id="matchesTitle">&#10084; Matches</div>
+      <div id="matchesList"></div>
+
+      <!-- BOOKMARKS -->
+      <div id="bookmarksSection" style="display:none;">
+        <div class="section-title-bar">&#128278; Bookmarked Listings</div>
+        <div id="bookmarksList"></div>
+      </div>
+
+    </div>
   </div>
 </main>
 
-<!-- Congratulations modal -->
+<!-- Congratulations Modal -->
 <div id="congratsModal" class="modal-overlay" style="display:none;">
-  <div class="modal-box" style="text-align:center;max-width:400px;">
-    <div style="font-size:56px;margin-bottom:12px;">🎉</div>
+  <div class="modal-box" style="max-width:400px;text-align:center;">
+    <div style="font-size:60px;margin-bottom:12px;">🎉</div>
     <h2 style="font-size:24px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">It's a Match!</h2>
-    <p style="color:var(--text-muted);margin-bottom:24px;">Both you and the employer are interested. You can now chat and arrange an interview.</p>
-    <button class="btn-primary-small" onclick="closeModal('congratsModal')">Start Chatting</button>
+    <p style="color:var(--text-muted);margin-bottom:24px;font-size:15px;">Both you and the employer are interested. You can now chat and arrange an interview!</p>
+    <button class="btn-primary-small" onclick="closeModal('congratsModal')">Start Chatting &#128172;</button>
   </div>
 </div>
 
-<!-- Interview offer modal (employer) -->
+<!-- Interview Offer Modal -->
 <div id="interviewModal" class="modal-overlay" style="display:none;">
   <div class="modal-box" style="max-width:400px;">
     <div class="modal-header">
-      <h3 class="modal-title">Offer Interview Schedule</h3>
+      <h3 class="modal-title">&#128197; Offer Interview Schedule</h3>
       <button class="modal-close-btn" onclick="closeModal('interviewModal')">&#10005;</button>
     </div>
     <div class="modal-body">
-      <div class="form-group"><label class="form-label">Date</label><input type="date" class="form-input" id="interviewDate"></div>
-      <div class="form-group"><label class="form-label">Time</label><input type="time" class="form-input" id="interviewTime"></div>
-      <div class="form-group"><label class="form-label">Message</label><input type="text" class="form-input" id="interviewMsg" placeholder="Please come prepared with your documents."></div>
+      <div class="form-group"><label class="form-label">Date</label><input type="date" class="form-input" id="iDate"></div>
+      <div class="form-group"><label class="form-label">Time</label><input type="time" class="form-input" id="iTime"></div>
+      <div class="form-group"><label class="form-label">Message to Applicant</label>
+        <input type="text" class="form-input" id="iMsg" placeholder="Please bring your certificates and valid ID.">
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-outline-small" onclick="closeModal('interviewModal')">Cancel</button>
@@ -87,118 +115,198 @@
 
 <script src="main.js"></script>
 <script>
-  var SUPABASE_URL  = 'https://mrjpkviryziixphuhmdp.supabase.co';
-  var SUPABASE_ANON = 'sb_publishable_7X6EhP6OU_bzbBc_hYiO0g_fVtru7nx';
-  var session       = JSON.parse(localStorage.getItem('sb_session') || 'null');
-  var currentProfile = null;
-  var activeMatchId  = null;
+  // ── DEMO MATCH DATA ──────────────────────────────────────────────────
+  var DEMO_MATCH = {
+    id: 'demo1',
+    listing: { id:'1', title:'Electrical Apprentice', company:'Santos Electric Services', type:'apprenticeship', city:'Batangas City', allowance:'450', duration:'6 months', icon:'⚡', verified:'true', skills:'Electrical Wiring, Safety Protocols' },
+    matched: true,
+    messages: [
+      { id:1, sender_role:'employee', sender_name:'Juan dela Cruz',     content:'Hi po! Nakita ko yung listing ninyo for Electrical Apprentice. Very interested po ako!',                                                          created_at:'Jan 15, 2025 · 10:23 AM', is_interview_offer:false },
+      { id:2, sender_role:'employer', sender_name:'Santos Electric',    content:'Hello Juan! Thank you for your interest. Can you tell us a bit about your electrical background?',                                                   created_at:'Jan 15, 2025 · 10:31 AM', is_interview_offer:false },
+      { id:3, sender_role:'employee', sender_name:'Juan dela Cruz',     content:'Natapos ko po ang TESDA NC II in Electrical Installation and Maintenance. Meron din po akong experience sa house wiring projects.',                  created_at:'Jan 15, 2025 · 10:45 AM', is_interview_offer:false },
+      { id:4, sender_role:'employer', sender_name:'Santos Electric',    content:'That is great Juan! Your background is a good fit for our apprenticeship program. We would like to invite you for an interview.',                    created_at:'Jan 15, 2025 · 10:52 AM', is_interview_offer:false },
+      { id:5, sender_role:'employer', sender_name:'Santos Electric',    content:'Please bring your TESDA certificate, 2x2 photo, and valid government ID.',                                                                           created_at:'Jan 15, 2025 · 10:53 AM', is_interview_offer:true, interview_date:'January 20, 2025', interview_time:'2:00 PM' },
+      { id:6, sender_role:'employee', sender_name:'Juan dela Cruz',     content:'Salamat po! I will be there. Saan po exact ang address ninyo?',                                                                                       created_at:'Jan 15, 2025 · 11:05 AM', is_interview_offer:false },
+      { id:7, sender_role:'employer', sender_name:'Santos Electric',    content:'Santos Electric Services, Block 5 Lot 2, Kumintang Ibaba, Batangas City. Near the Petron station. See you on the 20th!',                            created_at:'Jan 15, 2025 · 11:12 AM', is_interview_offer:false },
+      { id:8, sender_role:'employee', sender_name:'Juan dela Cruz',     content:'Noted po! Salamat! See you then. 🙏',                                                                                                                 created_at:'Jan 15, 2025 · 11:15 AM', is_interview_offer:false }
+    ]
+  };
 
-  function getToken() { return session ? session.access_token : null; }
+  var session      = JSON.parse(localStorage.getItem('sb_session') || 'null');
+  var currentRole  = null;
+  var activeMatchId= null;
 
   window.addEventListener('DOMContentLoaded', function() {
     var navActions = document.getElementById('navActions');
-    if (session && session.access_token) {
-      navActions.innerHTML = '<a href="profile.html" class="btn-outline-small">My Profile</a>&nbsp;<button class="btn-primary-small" onclick="doLogout()">Log Out</button>';
-      fetch('/api/auth-profile', { headers: { 'Authorization': 'Bearer ' + getToken() } })
-      .then(function(r) { return r.json(); })
-      .then(function(p) {
-        currentProfile = p;
-        document.getElementById('matchSubtitle').textContent =
-          p.role === 'employer' ? 'Youth applicants who expressed interest in your listings.' : 'Listings where both you and the employer swiped up.';
-        loadMatches();
-      });
-    } else {
+    if (!session || !session.access_token) {
       document.getElementById('notLoggedIn').style.display = 'block';
-      document.getElementById('matchSubtitle').textContent = 'Log in to see your matches.';
+      document.getElementById('pageSubtitle').textContent = 'Log in to see your matches.';
+      navActions.innerHTML = '<a href="login.html" class="btn-outline-small">Log In</a>';
+      return;
     }
+    navActions.innerHTML = '<a href="profile.html" class="btn-outline-small">My Profile</a>&nbsp;<button class="btn-primary-small" onclick="doLogout()">Log Out</button>';
+
+    fetch('/api/auth-profile', { headers: { 'Authorization': 'Bearer ' + session.access_token } })
+    .then(function(r) { return r.json(); })
+    .then(function(p) {
+      currentRole = p.role;
+      document.getElementById('mainContent').style.display = 'block';
+      if (p.role === 'employer') {
+        document.getElementById('pageSubtitle').textContent = 'Applicants who expressed interest in your listings.';
+        document.getElementById('matchesTitle').textContent = '👤 Applicant Matches';
+        renderEmployerView();
+      } else {
+        document.getElementById('pageSubtitle').textContent = 'Listings where you expressed interest.';
+        renderEmployeeView();
+      }
+    })
+    .catch(function() {
+      document.getElementById('notLoggedIn').style.display = 'block';
+    });
   });
 
-  function doLogout() { localStorage.removeItem('sb_session'); window.location.href = 'index.html'; }
+  // ── EMPLOYEE VIEW ─────────────────────────────────────────────────────
+  function renderEmployeeView() {
+    var localMatches = JSON.parse(localStorage.getItem('sb_local_matches') || '[]');
+    var matchesList  = document.getElementById('matchesList');
+    var allMatches   = [DEMO_MATCH];
 
-  function loadMatches() {
-    fetch('/api/matches', { headers: { 'Authorization': 'Bearer ' + getToken() } })
-    .then(function(r) { return r.json(); })
-    .then(function(matches) {
-      var list = document.getElementById('matchesList');
-      if (!matches.length) {
-        list.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-muted);">No matches yet. Go browse listings and swipe up on ones you like!</div>';
-        return;
+    // Add locally saved matches (from clicking interested)
+    localMatches.forEach(function(m) {
+      if (m.listing.id !== '1') { // avoid duplicating demo
+        allMatches.push({ id: m.id, listing: m.listing, matched: true, messages: [] });
       }
-      list.innerHTML = matches.map(function(m) { return buildMatchCard(m); }).join('');
     });
-  }
 
-  function buildMatchCard(m) {
-    var listing  = m.listings || {};
-    var isMatched = m.matched;
-    var matchedBadge = isMatched ? '<span style="background:#dcfce7;color:#15803d;font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;">&#10084; Matched</span>' : '<span style="background:#fef9c3;color:#92400e;font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;">&#9203; Pending</span>';
+    if (!allMatches.length) {
+      matchesList.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">No matches yet. Go browse listings and swipe Interested!</div>';
+    } else {
+      matchesList.innerHTML = allMatches.map(function(m) { return buildMatchCard(m, 'employee'); }).join('');
+    }
 
-    var otherParty = currentProfile.role === 'employee' ? (m.employer || {}) : (m.employee || {});
-
-    var chatHTML = '';
-    if (isMatched) {
-      var msgs = (m.messages || []).map(function(msg) {
-        var isMine = msg.sender_id === session.user.id;
-        if (msg.is_interview_offer) {
-          return '<div class="interview-bubble">&#128197; <strong>Interview Offer:</strong> ' + msg.interview_date + ' at ' + msg.interview_time + '<br><span style="color:var(--text-muted);">' + msg.content + '</span></div>';
-        }
-        return '<div class="msg-row clearfix"><div class="' + (isMine ? 'msg-mine' : 'msg-theirs') + ' msg-bubble">' +
-          (!isMine ? '<div class="msg-sender">' + (msg.sender ? msg.sender.full_name : '') + '</div>' : '') +
-          msg.content + '</div></div>';
+    // Bookmarks
+    var bookmarks = JSON.parse(localStorage.getItem('sb_bookmarks_full') || '[]');
+    if (bookmarks.length) {
+      document.getElementById('bookmarksSection').style.display = 'block';
+      document.getElementById('bookmarksList').innerHTML = bookmarks.map(function(l) {
+        return '<div class="bookmark-card">' +
+          '<div style="display:flex;align-items:center;gap:12px;">' +
+          '<div style="font-size:28px;">' + (l.icon||'💼') + '</div>' +
+          '<div>' +
+          '<div style="font-weight:700;">' + l.title + '</div>' +
+          '<div style="font-size:13px;color:var(--text-muted);">' + l.company + ' · ' + l.city + ' · ₱' + l.allowance + '/day</div>' +
+          '</div>' +
+          '<button class="tbl-btn tbl-btn-danger" onclick="removeBookmark(\'' + l.id + '\')" style="margin-left:auto;">Remove</button>' +
+          '</div></div>';
       }).join('');
-
-      var interviewBtn = currentProfile.role === 'employer'
-        ? '<button class="btn-outline-small" onclick="openInterviewModal(' + m.id + ')" style="margin-left:8px;">&#128197; Offer Interview</button>'
-        : '';
-
-      chatHTML = '<div class="chat-box" id="chatBox_' + m.id + '">' + (msgs || '<div style="color:var(--text-muted);text-align:center;padding:20px;font-size:13px;">No messages yet. Say hello!</div>') + '</div>' +
-        '<div style="display:flex;gap:8px;margin-top:10px;">' +
-        '<input type="text" class="form-input" id="msgInput_' + m.id + '" placeholder="Type a message..." style="flex:1;" onkeydown="if(event.key===\'Enter\')sendMessage(' + m.id + ')">' +
-        '<button class="btn-primary-small" onclick="sendMessage(' + m.id + ')">Send</button>' +
-        interviewBtn +
-        '</div>';
     }
-
-    var approveBtn = '';
-    if (currentProfile.role === 'employer' && m.employee_interested && !m.employer_interested) {
-      approveBtn = '<button class="btn-primary-small" onclick="approveMatch(' + m.id + ')">&#10003; Approve Match</button>';
-    }
-
-    return '<div class="match-card' + (isMatched ? ' is-matched' : '') + '">' +
-      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">' +
-      '<div style="font-size:32px;">' + (listing.icon || '💼') + '</div>' +
-      '<div style="flex:1;">' +
-      '<div style="font-weight:700;font-size:16px;color:var(--text-primary);">' + (listing.title || 'Listing') + '</div>' +
-      '<div style="font-size:13px;color:var(--text-muted);">' + (listing.company || '') + ' · ' + (listing.city || '') + '</div>' +
-      '<div style="font-size:13px;color:var(--text-muted);margin-top:2px;">With: ' + (otherParty.full_name || otherParty.company_name || 'Unknown') + '</div>' +
-      '</div>' + matchedBadge + '</div>' +
-      approveBtn + chatHTML + '</div>';
   }
 
-  function approveMatch(matchId) {
-    fetch('/api/matches', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-      body: JSON.stringify({ match_id: matchId })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(updated) {
-      if (updated.matched) openModal('congratsModal');
-      loadMatches();
-    });
+  // ── EMPLOYER VIEW ─────────────────────────────────────────────────────
+  function renderEmployerView() {
+    // Posted Jobs
+    var jobs = JSON.parse(localStorage.getItem('sb_posted_jobs') || '[]');
+    if (jobs.length) {
+      document.getElementById('postedJobsSection').style.display = 'block';
+      document.getElementById('postedJobsList').innerHTML = jobs.map(function(j) {
+        return '<div style="background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;">' +
+          '<div style="font-size:24px;">' + (j.icon||'💼') + '</div>' +
+          '<div><div style="font-weight:700;">' + j.title + '</div>' +
+          '<div style="font-size:13px;color:var(--text-muted);">' + j.city + ' · ₱' + j.allowance + '/day · ' + j.duration + '</div></div>' +
+          '<span style="margin-left:auto;font-size:12px;background:#dcfce7;color:#15803d;padding:3px 10px;border-radius:20px;">Active</span>' +
+          '</div>';
+      }).join('');
+    }
+
+    // Demo match from employee
+    var demoForEmployer = {
+      id: 'demo1',
+      listing: DEMO_MATCH.listing,
+      matched: true,
+      applicant: { name: 'Juan dela Cruz', city: 'Batangas City', skills: 'Electrical Wiring, Safety Protocols' },
+      messages: DEMO_MATCH.messages
+    };
+    document.getElementById('matchesList').innerHTML = buildMatchCard(demoForEmployer, 'employer');
   }
 
-  function sendMessage(matchId) {
+  // ── MATCH CARD BUILDER ───────────────────────────────────────────────
+  function buildMatchCard(m, role) {
+    var listing = m.listing || {};
+    var statusBadge = '<span style="background:#dcfce7;color:#15803d;font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;">&#10084; Matched</span>';
+    var otherName = role === 'employee'
+      ? (listing.company || 'Employer')
+      : ((m.applicant && m.applicant.name) || 'Juan dela Cruz');
+
+    // Build chat messages
+    var chatMsgs = (m.messages || []).map(function(msg) {
+      var isMine = (role === 'employee' && msg.sender_role === 'employee') ||
+                   (role === 'employer' && msg.sender_role === 'employer');
+      if (msg.is_interview_offer) {
+        return '<div class="interview-card">&#128197; <strong>Interview Offer</strong><br>' +
+          '<strong>Date:</strong> ' + msg.interview_date + ' &nbsp;|&nbsp; <strong>Time:</strong> ' + msg.interview_time + '<br>' +
+          '<span style="color:var(--text-muted);">' + msg.content + '</span></div>';
+      }
+      return '<div class="msg-row ' + (isMine ? 'mine' : 'theirs') + '">' +
+        (!isMine ? '<div class="msg-sender">' + msg.sender_name + '</div>' : '') +
+        '<div class="msg-bubble ' + (isMine ? 'msg-mine' : 'msg-theirs') + '">' + msg.content + '</div>' +
+        '<div class="msg-time">' + msg.created_at + '</div></div>';
+    }).join('');
+
+    // Local messages stored in browser
+    var localMsgs = JSON.parse(localStorage.getItem('sb_chat_' + m.id) || '[]');
+    var localMsgsHTML = localMsgs.map(function(msg) {
+      var isMine = msg.sender_role === role;
+      if (msg.is_interview_offer) {
+        return '<div class="interview-card">&#128197; <strong>Interview Offer</strong><br>' +
+          '<strong>Date:</strong> ' + msg.interview_date + ' &nbsp;|&nbsp; <strong>Time:</strong> ' + msg.interview_time + '<br>' +
+          '<span style="color:var(--text-muted);">' + msg.content + '</span></div>';
+      }
+      return '<div class="msg-row ' + (isMine ? 'mine' : 'theirs') + '">' +
+        (!isMine ? '<div class="msg-sender">' + msg.sender_name + '</div>' : '') +
+        '<div class="msg-bubble ' + (isMine ? 'msg-mine' : 'msg-theirs') + '">' + msg.content + '</div>' +
+        '<div class="msg-time">' + msg.created_at + '</div></div>';
+    }).join('');
+
+    var interviewBtn = role === 'employer'
+      ? '<button class="btn-outline-small" onclick="openInterviewModal(\'' + m.id + '\')" style="margin-left:8px;">&#128197; Offer Interview</button>'
+      : '';
+
+    return '<div class="match-card is-matched" id="matchCard_' + m.id + '">' +
+      '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap;">' +
+      '<div style="font-size:36px;">' + (listing.icon||'💼') + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+      '<div style="font-weight:700;font-size:16px;">' + (listing.title||'Listing') + '</div>' +
+      '<div style="font-size:13px;color:var(--text-muted);">' + (listing.company||'') + ' · ' + (listing.city||'') + '</div>' +
+      '<div style="font-size:13px;color:var(--text-muted);margin-top:2px;">With: <strong>' + otherName + '</strong></div>' +
+      '</div>' + statusBadge + '</div>' +
+      '<div class="chat-box" id="chatBox_' + m.id + '">' + chatMsgs + localMsgsHTML + '</div>' +
+      '<div style="display:flex;gap:8px;margin-top:10px;">' +
+      '<input type="text" class="form-input" id="msgInput_' + m.id + '" placeholder="Type a message..." style="flex:1;" onkeydown="if(event.key===\'Enter\')sendMsg(\'' + m.id + '\',\'' + role + '\')">' +
+      '<button class="btn-primary-small" onclick="sendMsg(\'' + m.id + '\',\'' + role + '\')">Send</button>' +
+      interviewBtn + '</div></div>';
+  }
+
+  // ── CHAT ─────────────────────────────────────────────────────────────
+  function sendMsg(matchId, role) {
     var input   = document.getElementById('msgInput_' + matchId);
     var content = input.value.trim();
     if (!content) return;
     input.value = '';
-    fetch('/api/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-      body: JSON.stringify({ match_id: matchId, content: content })
-    })
-    .then(function() { loadMatches(); });
+
+    var senderName = role === 'employee' ? 'Juan dela Cruz' : 'Santos Electric';
+    var now = new Date().toLocaleString('en-PH', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' });
+
+    var msgs = JSON.parse(localStorage.getItem('sb_chat_' + matchId) || '[]');
+    msgs.push({ sender_role: role, sender_name: senderName, content: content, created_at: now, is_interview_offer: false });
+    localStorage.setItem('sb_chat_' + matchId, JSON.stringify(msgs));
+
+    var chatBox = document.getElementById('chatBox_' + matchId);
+    var isMine = true;
+    var newMsg = document.createElement('div');
+    newMsg.className = 'msg-row mine';
+    newMsg.innerHTML = '<div class="msg-bubble msg-mine">' + content + '</div><div class="msg-time">' + now + '</div>';
+    chatBox.appendChild(newMsg);
+    chatBox.scrollTop = chatBox.scrollHeight;
   }
 
   function openInterviewModal(matchId) {
@@ -207,16 +315,50 @@
   }
 
   function sendInterviewOffer() {
-    var date = document.getElementById('interviewDate').value;
-    var time = document.getElementById('interviewTime').value;
-    var msg  = document.getElementById('interviewMsg').value.trim() || 'Please come prepared with your documents.';
+    var date = document.getElementById('iDate').value;
+    var time = document.getElementById('iTime').value;
+    var msg  = document.getElementById('iMsg').value.trim() || 'Please bring your certificates and valid ID.';
     if (!date || !time) { showToast('Please set a date and time.', 'error'); return; }
-    fetch('/api/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-      body: JSON.stringify({ match_id: activeMatchId, content: msg, interview_date: date, interview_time: time, is_interview_offer: true })
-    })
-    .then(function() { closeModal('interviewModal'); loadMatches(); showToast('Interview offer sent!'); });
+
+    var fDate = new Date(date).toLocaleDateString('en-PH', { month:'long', day:'numeric', year:'numeric' });
+    var fTime = (function() {
+      var parts = time.split(':');
+      var h = parseInt(parts[0]), m = parts[1], ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      return h + ':' + m + ' ' + ampm;
+    })();
+    var now = new Date().toLocaleString('en-PH', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' });
+
+    var msgs = JSON.parse(localStorage.getItem('sb_chat_' + activeMatchId) || '[]');
+    msgs.push({ sender_role:'employer', sender_name:'Santos Electric', content: msg, created_at: now, is_interview_offer: true, interview_date: fDate, interview_time: fTime });
+    localStorage.setItem('sb_chat_' + activeMatchId, JSON.stringify(msgs));
+
+    var chatBox = document.getElementById('chatBox_' + activeMatchId);
+    var bubble  = document.createElement('div');
+    bubble.className = 'interview-card';
+    bubble.innerHTML = '&#128197; <strong>Interview Offer</strong><br><strong>Date:</strong> ' + fDate + ' &nbsp;|&nbsp; <strong>Time:</strong> ' + fTime + '<br><span style="color:var(--text-muted);">' + msg + '</span>';
+    chatBox.appendChild(bubble);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    closeModal('interviewModal');
+    showToast('Interview offer sent!');
+    document.getElementById('iDate').value = '';
+    document.getElementById('iTime').value = '';
+    document.getElementById('iMsg').value  = '';
+  }
+
+  // ── BOOKMARKS ─────────────────────────────────────────────────────────
+  function removeBookmark(listingId) {
+    var bookmarks = JSON.parse(localStorage.getItem('sb_bookmarks_full') || '[]');
+    bookmarks = bookmarks.filter(function(b) { return String(b.id) !== String(listingId); });
+    localStorage.setItem('sb_bookmarks_full', JSON.stringify(bookmarks));
+    renderEmployeeView();
+    showToast('Bookmark removed.', 'warn');
+  }
+
+  function doLogout() {
+    localStorage.removeItem('sb_session');
+    window.location.href = 'index.html';
   }
 </script>
 </body>

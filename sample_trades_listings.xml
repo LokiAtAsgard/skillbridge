@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skillbridge>
+  <listings>
+    <listing id="201">
+      <title>Ironworks Apprentice</title>
+      <company>MetalCraft Corporation</company>
+      <type>apprenticeship</type>
+      <industry>manufacturing</industry>
+      <city>Batangas City</city>
+      <allowance>450</allowance>
+      <duration>6 months</duration>
+      <slots>3</slots>
+      <skills>Iron Fabrication, Welding, Blueprint Reading</skills>
+      <verified>true</verified>
+      <featured>false</featured>
+      <status>active</status>
+      <posted>2024-12-02</posted>
+      <icon>🔨</icon>
+    </listing>
+    <listing id="202">
+      <title>Roofing Apprentice</title>
+      <company>TopShield Roofing</company>
+      <type>apprenticeship</type>
+      <industry>construction</industry>
+      <city>Lipa City</city>
+      <allowance>420</allowance>
+      <duration>6 months</duration>
+      <slots>2</slots>
+      <skills>Roofing Installation, Safety Harness, Sheet Metal</skills>
+      <verified>true</verified>
+      <featured>false</featured>
+      <status>active</status>
+      <posted>2024-12-04</posted>
+      <icon>🏗️</icon>
+    </listing>
+    <listing id="203">
+      <title>Masonry Apprentice</title>
+      <company>StoneWork PH</company>
+      <type>apprenticeship</type>
+      <industry>construction</industry>
+      <city>Tanauan</city>
+      <allowance>410</allowance>
+      <duration>6 months</duration>
+      <slots>2</slots>
+      <skills>Bricklaying, Concrete Mixing, Troweling</skills>
+      <verified>true</verified>
+      <featured>false</featured>
+      <status>active</status>
+      <posted>2024-12-06</posted>
+      <icon>🧱</icon>
+    </listing>
+    <listing id="204">
+      <title>Glass Installation Apprentice</title>
+      <company>ClearView Glass Works</company>
+      <type>apprenticeship</type>
+      <industry>construction</industry>
+      <city>Calamba</city>
+      <allowance>430</allowance>
+      <duration>6 months</duration>
+      <slots>2</slots>
+      <skills>Glass Cutting, Frame Installation, Sealing</skills>
+      <verified>true</verified>
+      <featured>false</featured>
+      <status>active</status>
+      <posted>2024-12-09</posted>
+      <icon>🪟</icon>
+    </listing>
+    <listing id="205">
+      <title>Flooring Apprentice</title>
+      <company>FloorMaster PH</company>
+      <type>apprenticeship</type>
+      <industry>construction</industry>
+      <city>Batangas City</city>
+      <allowance>440</allowance>
+      <duration>6 months</duration>
+      <slots>2</slots>
+      <skills>Tile Setting, Vinyl Installation, Surface Leveling</skills>
+      <verified>true</verified>
+      <featured>false</featured>
+      <status>active</status>
+      <posted>2024-12-11</posted>
+      <icon>🪵</icon>
+    </listing>
+  </listings>
+</skillbridge>

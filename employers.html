@@ -5,10 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>For Employers — SkillBridge</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    .posted-job-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;}
+    .posted-job-card h4{margin:0 0 6px;font-size:16px;color:var(--text-primary);}
+    .posted-job-meta{font-size:13px;color:var(--text-muted);margin-bottom:8px;}
+    .posted-job-skills{font-size:12px;color:var(--text-secondary);}
+  </style>
 </head>
 <body>
-
 <nav class="navbar" id="mainNavbar">
   <div class="nav-container">
     <a href="index.html" class="nav-logo">Skill<span>Bridge</span></a>
@@ -19,274 +24,126 @@
       <li><a href="employers.html" class="nav-link active">For Employers</a></li>
       <li><a href="admin.html" class="nav-link">Admin</a></li>
     </ul>
-    <div class="nav-actions">
+    <div class="nav-actions" id="navActions">
       <a href="login.html" class="btn-outline-small">Log In</a>
-      <a href="admin.html" class="btn-primary-small">Post a Job</a>
+      <a href="register.html" class="btn-primary-small">Sign Up Free</a>
     </div>
     <button class="nav-hamburger" onclick="toggleMobileNav()">&#9776;</button>
   </div>
 </nav>
 
-<!-- HERO -->
-<section style="background: linear-gradient(158deg, var(--green-deepest) 0%, #0a3d1c 60%, var(--green-dark) 100%); padding: 120px 0 80px; margin-top: var(--nav-height);">
-  <div class="section-container" style="text-align: center;">
-    <div class="section-eyebrow" style="color: var(--green-bright);">For SMEs and Businesses</div>
-    <h1 style="font-family: 'Playfair Display', serif; font-size: clamp(32px,5vw,52px); color: white; line-height: 1.15; margin-bottom: 18px; max-width: 720px; margin-left: auto; margin-right: auto;">
-      Find Pre-Matched Apprentices Without the Paperwork
-    </h1>
-    <p style="font-size: 17px; color: rgba(255,255,255,.68); max-width: 560px; margin: 0 auto 36px; line-height: 1.65;">
-      Post your listing once. SkillBridge matches you with youth who already have the skills you need, filtered by location. All employers are verified through PESO before they can post.
-    </p>
-    <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
-      <a href="admin.html" class="btn-primary-large">Post a Job Now</a>
-      <a href="#plans" class="btn-outline-large" style="color: white; border-color: white;">See Pricing Plans</a>
+<!-- Hero -->
+<section style="background:linear-gradient(135deg,var(--green-deepest),var(--green-dark));padding:80px 24px;text-align:center;color:#fff;">
+  <div style="max-width:700px;margin:0 auto;">
+    <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-bottom:12px;">For Employers</div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,48px);margin:0 0 16px;">Find Your Next Apprentice or Intern</h1>
+    <p style="font-size:16px;opacity:.85;max-width:520px;margin:0 auto 32px;line-height:1.7;">Post opportunities, review applicants, and connect with verified youth talent in CALABARZON — all for free.</p>
+    <button class="btn-primary-large" onclick="handlePostJob()" style="background:#22c55e;border-color:#22c55e;">Post a Job Now</button>
+  </div>
+</section>
+
+<!-- Features -->
+<section style="padding:64px 24px;background:var(--white);">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:40px;">
+      <div class="section-eyebrow">Why SkillBridge</div>
+      <h2 class="section-headline">Built for SMEs in CALABARZON</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+      <div class="trust-card"><div class="trust-icon">&#127963;</div><h3 class="trust-title">PESO-Verified Pool</h3><p class="trust-detail">All youth applicants are pre-screened through PESO accreditation channels before they can apply.</p></div>
+      <div class="trust-card"><div class="trust-icon">&#128269;</div><h3 class="trust-title">Skill-Based Matching</h3><p class="trust-detail">Our system filters applicants based on your required skills and preferred proximity — saving you time.</p></div>
+      <div class="trust-card"><div class="trust-icon">&#128172;</div><h3 class="trust-title">Built-In Chat</h3><p class="trust-detail">Once matched, chat directly with applicants and schedule interviews without leaving the platform.</p></div>
     </div>
   </div>
 </section>
 
-<!-- STATS -->
-<section style="background: var(--green-main); padding: 32px 0;">
-  <div class="section-container">
-    <div style="display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; text-align: center;">
-      <div>
-        <div style="font-size: 32px; font-weight: 700; color: white;">99.5%</div>
-        <div style="font-size: 12px; color: rgba(255,255,255,.7); margin-top: 4px;">of PH businesses are SMEs</div>
-      </div>
-      <div>
-        <div style="font-size: 32px; font-weight: 700; color: white;">65%</div>
-        <div style="font-size: 12px; color: rgba(255,255,255,.7); margin-top: 4px;">of national employment from SMEs</div>
-      </div>
-      <div>
-        <div style="font-size: 32px; font-weight: 700; color: white;">18,442</div>
-        <div style="font-size: 12px; color: rgba(255,255,255,.7); margin-top: 4px;">formal placements in 2023 only</div>
-      </div>
-      <div>
-        <div style="font-size: 32px; font-weight: 700; color: white;">Free</div>
-        <div style="font-size: 12px; color: rgba(255,255,255,.7); margin-top: 4px;">to get started for all SMEs</div>
-      </div>
+<!-- My Posted Jobs (shown when logged in as employer) -->
+<section id="myJobsSection" style="display:none;padding:48px 24px;background:var(--surface);">
+  <div style="max-width:800px;margin:0 auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+      <h2 style="margin:0;font-size:22px;font-weight:700;">My Posted Jobs</h2>
+      <button class="btn-primary-small" onclick="handlePostJob()">+ Post Another Job</button>
+    </div>
+    <div id="myJobsList">
+      <div style="text-align:center;padding:40px;color:var(--text-muted);">No jobs posted yet. Click Post a Job to get started.</div>
     </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS FOR EMPLOYERS -->
-<section style="padding: 88px 0; background: var(--surface);">
-  <div class="section-container">
-    <div class="section-header">
-      <div class="section-eyebrow">Simple Process</div>
-      <h2 class="section-headline">How It Works for You</h2>
-      <p class="section-description">No complicated setup. No HR department needed.</p>
-    </div>
-    <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-number">01</div>
-        <div class="step-icon">&#127963;</div>
-        <h3 class="step-title">Register and Get Verified</h3>
-        <p class="step-detail">Create your employer account. Our team and PESO officers verify your business to give you the Verified Employer badge.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-number">02</div>
-        <div class="step-icon">&#128203;</div>
-        <h3 class="step-title">Post Your Listing</h3>
-        <p class="step-detail">Fill out the job details, required skills from TESDA taxonomy, duration, allowance, and location. Takes less than five minutes.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-number">03</div>
-        <div class="step-icon">&#129302;</div>
-        <h3 class="step-title">Get AI-Ranked Candidates</h3>
-        <p class="step-detail">The system automatically surfaces the best-matched youth based on skill alignment and proximity. You review and swipe.</p>
-      </div>
+<!-- Employee popup -->
+<div id="employeePopup" class="modal-overlay" style="display:none;">
+  <div class="modal-box" style="max-width:380px;text-align:center;">
+    <div style="font-size:48px;margin-bottom:12px;">⚠️</div>
+    <h3 style="font-size:20px;font-weight:700;margin-bottom:8px;">You're logged in as an Employee</h3>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:24px;">Posting jobs is only available for employer accounts. Please log in with an employer account or register as an employer.</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-outline-small" onclick="closeModal('employeePopup')">Close</button>
+      <button class="btn-primary-small" onclick="doLogout()">Switch Account</button>
+      <a href="register.html" class="btn-primary-small" style="text-decoration:none;">Register as Employer</a>
     </div>
   </div>
-</section>
+</div>
 
-<!-- FEATURES -->
-<section style="padding: 88px 0; background: var(--white);">
-  <div class="section-container">
-    <div class="section-header">
-      <div class="section-eyebrow">Platform Features</div>
-      <h2 class="section-headline">Everything You Need to Hire Right</h2>
+<!-- Post Job Modal -->
+<div id="postJobModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box" style="max-width:560px;max-height:90vh;overflow-y:auto;">
+    <div class="modal-header">
+      <h3 class="modal-title">Post a New Job</h3>
+      <button class="modal-close-btn" onclick="closeModal('postJobModal')">&#10005;</button>
     </div>
-    <div class="trust-grid six-col">
-      <div class="trust-card">
-        <div class="trust-icon">&#9989;</div>
-        <h3 class="trust-title">PESO-Verified Badge</h3>
-        <p class="trust-detail">Your listing shows a verified badge that youth can trust. Required before any posting goes live.</p>
-      </div>
-      <div class="trust-card">
-        <div class="trust-icon">&#129302;</div>
-        <h3 class="trust-title">AI Candidate Ranking</h3>
-        <p class="trust-detail">Best-matched candidates appear first. No sorting through hundreds of irrelevant applicants.</p>
-      </div>
-      <div class="trust-card">
-        <div class="trust-icon">&#127775;</div>
-        <h3 class="trust-title">Featured Listings</h3>
-        <p class="trust-detail">Pay for priority placement and your listing appears at the top of results for youth in your area.</p>
-      </div>
-      <div class="trust-card">
-        <div class="trust-icon">&#128200;</div>
-        <h3 class="trust-title">Analytics Dashboard</h3>
-        <p class="trust-detail">See how many youth viewed your listing, how many swiped up, and how many matched with you.</p>
-      </div>
-      <div class="trust-card">
-        <div class="trust-icon">&#128172;</div>
-        <h3 class="trust-title">Permission-Based Chat</h3>
-        <p class="trust-detail">Only matched candidates can message you. No spam. No cold messages from unqualified applicants.</p>
-      </div>
-      <div class="trust-card">
-        <div class="trust-icon">&#128197;</div>
-        <h3 class="trust-title">Interview Scheduler</h3>
-        <p class="trust-detail">Built-in calendar lets you set interview times directly in the chat. Firebase sends push notifications.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PRICING PLANS -->
-<section style="padding: 88px 0; background: var(--green-ghost);" id="plans">
-  <div class="section-container">
-    <div class="section-header">
-      <div class="section-eyebrow">Pricing Plans</div>
-      <h2 class="section-headline">Simple and Transparent Pricing</h2>
-      <p class="section-description">Start free. Upgrade when you are ready to scale your hiring.</p>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 900px; margin: 0 auto;">
-
-      <!-- Free -->
-      <div class="plan-card">
-        <div class="plan-name">Free</div>
-        <div class="plan-price">&#8369;0</div>
-        <div class="plan-period">forever</div>
-        <ul class="plan-features">
-          <li>1 active job posting</li>
-          <li>Basic candidate matching</li>
-          <li>PESO verification included</li>
-          <li>Standard listing placement</li>
-          <li>Permission-based chat</li>
-        </ul>
-        <a href="admin.html" class="btn-outline-small plan-btn" style="display:block; text-align:center; margin-top:16px;">Get Started</a>
-      </div>
-
-      <!-- Pro -->
-      <div class="plan-card plan-card-featured">
-        <div class="plan-badge">Most Popular</div>
-        <div class="plan-name">Pro</div>
-        <div class="plan-price">&#8369;999</div>
-        <div class="plan-period">per month</div>
-        <ul class="plan-features">
-          <li>Up to 10 active postings</li>
-          <li>Featured listing placement</li>
-          <li>AI candidate ranking</li>
-          <li>Analytics dashboard</li>
-          <li>Priority support</li>
-          <li>Interview scheduler</li>
-        </ul>
-        <a href="admin.html" class="btn-primary-small plan-btn" style="display:block; text-align:center; margin-top:16px;">Start Free Trial</a>
-      </div>
-
-      <!-- Enterprise -->
-      <div class="plan-card">
-        <div class="plan-name">Enterprise</div>
-        <div class="plan-price">Custom</div>
-        <div class="plan-period">negotiated</div>
-        <ul class="plan-features">
-          <li>Unlimited postings</li>
-          <li>PESO/LGU institutional license</li>
-          <li>Bulk hiring tools</li>
-          <li>Full analytics export</li>
-          <li>Dedicated account manager</li>
-          <li>DOLE/TESDA integration</li>
-        </ul>
-        <a href="admin.html" class="btn-outline-small plan-btn" style="display:block; text-align:center; margin-top:16px;">Contact Us</a>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- TRUST / VERIFICATION -->
-<section style="padding: 88px 0; background: var(--white);">
-  <div class="section-container">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;">
-      <div>
-        <div class="section-eyebrow">Safety and Trust</div>
-        <h2 class="section-headline" style="text-align: left; margin-bottom: 18px;">Why Youth Trust SkillBridge Employers</h2>
-        <p style="font-size: 15px; color: var(--text-muted); line-height: 1.65; margin-bottom: 24px;">
-          Scam job postings are a real problem in the Philippines. SkillBridge addresses this by requiring all employers to go through PESO verification before any listing goes live. Youth can see your Verified badge and know the opportunity is legitimate.
-        </p>
-        <ul style="display: flex; flex-direction: column; gap: 12px;">
-          <li style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: var(--gray-600);">
-            <span style="color: var(--green-main); font-weight: 700; font-size: 16px; flex-shrink: 0;">&#10003;</span>
-            Business registration verified through PESO
-          </li>
-          <li style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: var(--gray-600);">
-            <span style="color: var(--green-main); font-weight: 700; font-size: 16px; flex-shrink: 0;">&#10003;</span>
-            Listings reviewed before going live
-          </li>
-          <li style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: var(--gray-600);">
-            <span style="color: var(--green-main); font-weight: 700; font-size: 16px; flex-shrink: 0;">&#10003;</span>
-            Report and flag system for suspicious activity
-          </li>
-          <li style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: var(--gray-600);">
-            <span style="color: var(--green-main); font-weight: 700; font-size: 16px; flex-shrink: 0;">&#10003;</span>
-            Allowance and duration must follow DOLE DO 186-17
-          </li>
-        </ul>
-      </div>
-      <div style="background: var(--green-ghost); border-radius: 20px; padding: 36px; border: 1px solid var(--gray-200);">
-        <div style="font-size: 48px; margin-bottom: 16px; text-align: center;">&#127963;</div>
-        <h3 style="font-size: 18px; font-weight: 700; color: var(--green-deepest); margin-bottom: 10px; text-align: center;">How to Get Verified</h3>
-        <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 20px;">
-          <div style="display: flex; gap: 12px; align-items: flex-start;">
-            <div style="width: 26px; height: 26px; background: var(--green-main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;">1</div>
-            <div style="font-size: 13.5px; color: var(--gray-600); line-height: 1.5;">Register your employer account on SkillBridge</div>
-          </div>
-          <div style="display: flex; gap: 12px; align-items: flex-start;">
-            <div style="width: 26px; height: 26px; background: var(--green-main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;">2</div>
-            <div style="font-size: 13.5px; color: var(--gray-600); line-height: 1.5;">Submit your DTI/SEC registration and PESO accreditation documents</div>
-          </div>
-          <div style="display: flex; gap: 12px; align-items: flex-start;">
-            <div style="width: 26px; height: 26px; background: var(--green-main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;">3</div>
-            <div style="font-size: 13.5px; color: var(--gray-600); line-height: 1.5;">Receive your Verified Employer badge within 3 to 5 business days</div>
-          </div>
-          <div style="display: flex; gap: 12px; align-items: flex-start;">
-            <div style="width: 26px; height: 26px; background: var(--green-main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;">4</div>
-            <div style="font-size: 13.5px; color: var(--gray-600); line-height: 1.5;">Post your first listing and start receiving matched applicants</div>
-          </div>
+    <div class="modal-body">
+      <div class="form-row-two">
+        <div class="form-group"><label class="form-label">Job Title *</label><input type="text" class="form-input" id="jTitle" placeholder="e.g. Electrical Apprentice"></div>
+        <div class="form-group"><label class="form-label">Type *</label>
+          <select class="form-select" id="jType">
+            <option value="apprenticeship">Apprenticeship</option>
+            <option value="internship">Internship</option>
+          </select>
         </div>
-        <a href="admin.html" class="btn-primary-full" style="margin-top: 24px;">Post Your First Job Free</a>
       </div>
+      <div class="form-row-two">
+        <div class="form-group"><label class="form-label">Industry *</label>
+          <select class="form-select" id="jIndustry">
+            <option value="">Select industry</option>
+            <option value="electrical">Electrical</option>
+            <option value="automotive">Automotive</option>
+            <option value="construction">Construction</option>
+            <option value="it">Information Technology</option>
+            <option value="food">Food Service</option>
+            <option value="manufacturing">Manufacturing</option>
+            <option value="retail">Retail</option>
+            <option value="healthcare">Healthcare</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">City *</label>
+          <select class="form-select" id="jCity">
+            <option value="">Select city</option>
+            <option>Batangas City</option><option>Lipa City</option><option>Calamba</option>
+            <option>Santa Rosa</option><option>Antipolo</option><option>Lucena</option>
+            <option>Tanauan</option><option>Cabuyao</option><option>Santo Tomas</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-two">
+        <div class="form-group"><label class="form-label">Daily Allowance (&#8369;)</label><input type="number" class="form-input" id="jAllowance" placeholder="450"></div>
+        <div class="form-group"><label class="form-label">Duration</label><input type="text" class="form-input" id="jDuration" placeholder="6 months"></div>
+      </div>
+      <div class="form-row-two">
+        <div class="form-group"><label class="form-label">Slots Available</label><input type="number" class="form-input" id="jSlots" placeholder="2" min="1"></div>
+        <div class="form-group"><label class="form-label">Work Schedule</label><input type="text" class="form-input" id="jSchedule" placeholder="Mon–Fri, 8AM–5PM"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Required Skills (comma-separated)</label><input type="text" class="form-input" id="jSkills" placeholder="Electrical Wiring, Safety Protocols"></div>
+      <div class="form-group"><label class="form-label">Job Description</label><textarea class="form-input" id="jDesc" rows="3" placeholder="Describe the role, responsibilities, and what the applicant will learn." style="resize:vertical;"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline-small" onclick="closeModal('postJobModal')">Cancel</button>
+      <button class="btn-primary-small" onclick="submitJob()">Post Job</button>
     </div>
   </div>
-</section>
+</div>
 
 <footer class="site-footer">
   <div class="footer-container">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <div class="footer-logo">Skill<span>Bridge</span></div>
-        <p class="footer-tagline">Bridging the gap between Filipino youth and the apprenticeships they deserve.</p>
-        <div class="footer-sdg-badge">SDG 8: Decent Work &amp; Economic Growth</div>
-      </div>
-      <div class="footer-links-col">
-        <div class="footer-col-title">For Youth</div>
-        <a href="listings.html">Browse Jobs</a>
-        <a href="matches.html">My Matches</a>
-        <a href="index.html#how-it-works">How It Works</a>
-      </div>
-      <div class="footer-links-col">
-        <div class="footer-col-title">For Employers</div>
-        <a href="admin.html">Post a Job</a>
-        <a href="#plans">Pricing Plans</a>
-        <a href="#">PESO Verification</a>
-      </div>
-      <div class="footer-links-col">
-        <div class="footer-col-title">Platform</div>
-        <a href="admin.html">Admin Panel</a>
-        <a href="#">Safety Policy</a>
-        <a href="#">Privacy Policy</a>
-      </div>
-    </div>
     <div class="footer-bottom">
       <p>2024 SkillBridge. BSIT IT3A — Technopreneurship. Developed by Manhic, Orlanes, and Ramos.</p>
     </div>
@@ -294,5 +151,143 @@
 </footer>
 
 <script src="main.js"></script>
+<script>
+  var session = JSON.parse(localStorage.getItem('sb_session') || 'null');
+  var currentRole = null;
+
+  window.addEventListener('DOMContentLoaded', function() {
+    if (session && session.access_token) {
+      var profile = JSON.parse(localStorage.getItem('sb_profile_extended') || '{}');
+      // Get role from API
+      fetch('/api/auth-profile', { headers: { 'Authorization': 'Bearer ' + session.access_token } })
+      .then(function(r) { return r.json(); })
+      .then(function(p) {
+        currentRole = p.role;
+        document.getElementById('navActions').innerHTML =
+          '<a href="profile.html" class="btn-outline-small">My Profile</a>&nbsp;' +
+          '<button class="btn-primary-small" onclick="doLogout()">Log Out</button>';
+        if (p.role === 'employer') {
+          document.getElementById('myJobsSection').style.display = 'block';
+          renderPostedJobs();
+        }
+      })
+      .catch(function() {});
+    }
+  });
+
+  function handlePostJob() {
+    if (!session || !session.access_token) {
+      window.location.href = 'login.html';
+      return;
+    }
+    if (currentRole === 'employee') {
+      openModal('employeePopup');
+      return;
+    }
+    if (currentRole === 'employer') {
+      openModal('postJobModal');
+      return;
+    }
+    // Role not loaded yet — fetch first
+    fetch('/api/auth-profile', { headers: { 'Authorization': 'Bearer ' + session.access_token } })
+    .then(function(r) { return r.json(); })
+    .then(function(p) {
+      currentRole = p.role;
+      handlePostJob();
+    })
+    .catch(function() { window.location.href = 'login.html'; });
+  }
+
+  function submitJob() {
+    var title    = document.getElementById('jTitle').value.trim();
+    var type     = document.getElementById('jType').value;
+    var industry = document.getElementById('jIndustry').value;
+    var city     = document.getElementById('jCity').value;
+    var allowance= document.getElementById('jAllowance').value;
+    var duration = document.getElementById('jDuration').value.trim();
+    var slots    = document.getElementById('jSlots').value || '1';
+    var schedule = document.getElementById('jSchedule').value.trim();
+    var skills   = document.getElementById('jSkills').value.trim();
+    var desc     = document.getElementById('jDesc').value.trim();
+
+    if (!title || !city || !industry) {
+      showToast('Title, industry, and city are required.', 'error'); return;
+    }
+
+    var jobs = JSON.parse(localStorage.getItem('sb_posted_jobs') || '[]');
+    var icons = { electrical:'⚡', automotive:'🔧', construction:'🏗️', it:'💻', food:'🍳', manufacturing:'⚙️', retail:'🛒', healthcare:'🏥' };
+    var newJob = {
+      id: 'job_' + Date.now(),
+      title: title,
+      type: type,
+      industry: industry,
+      city: city,
+      allowance: allowance || '0',
+      duration: duration || 'TBD',
+      slots: slots,
+      schedule: schedule,
+      skills: skills,
+      description: desc,
+      icon: icons[industry] || '💼',
+      posted: new Date().toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: 'active'
+    };
+    jobs.push(newJob);
+    localStorage.setItem('sb_posted_jobs', JSON.stringify(jobs));
+    closeModal('postJobModal');
+    document.getElementById('myJobsSection').style.display = 'block';
+    renderPostedJobs();
+    showToast('Job posted successfully!');
+    // Clear form
+    ['jTitle','jAllowance','jDuration','jSlots','jSchedule','jSkills','jDesc'].forEach(function(id) {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('jIndustry').value = '';
+    document.getElementById('jCity').value = '';
+  }
+
+  function renderPostedJobs() {
+    var jobs = JSON.parse(localStorage.getItem('sb_posted_jobs') || '[]');
+    var container = document.getElementById('myJobsList');
+    if (!jobs.length) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">No jobs posted yet. Click Post a Job to get started.</div>';
+      return;
+    }
+    container.innerHTML = jobs.map(function(j) {
+      return '<div class="posted-job-card">' +
+        '<div style="display:flex;align-items:flex-start;gap:14px;">' +
+        '<div style="font-size:28px;">' + j.icon + '</div>' +
+        '<div style="flex:1;">' +
+        '<h4>' + j.title + '</h4>' +
+        '<div class="posted-job-meta">' +
+          '<span class="badge badge-' + j.type + '">' + j.type + '</span> &nbsp;' +
+          '&#128205; ' + j.city + ' &nbsp;·&nbsp; &#8369;' + j.allowance + '/day &nbsp;·&nbsp; ' + j.duration +
+          (j.slots ? ' &nbsp;·&nbsp; ' + j.slots + ' slot(s)' : '') +
+          (j.schedule ? ' &nbsp;·&nbsp; ' + j.schedule : '') +
+        '</div>' +
+        (j.skills ? '<div class="posted-job-skills">Skills: ' + j.skills + '</div>' : '') +
+        (j.description ? '<div style="font-size:13px;color:var(--text-secondary);margin-top:8px;">' + j.description + '</div>' : '') +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;gap:6px;">' +
+        '<span style="font-size:11px;color:var(--text-muted);">Posted ' + j.posted + '</span>' +
+        '<button class="tbl-btn tbl-btn-danger" onclick="deleteJob(\'' + j.id + '\')">Delete</button>' +
+        '</div></div></div>';
+    }).join('');
+  }
+
+  function deleteJob(jobId) {
+    if (!confirm('Delete this job posting?')) return;
+    var jobs = JSON.parse(localStorage.getItem('sb_posted_jobs') || '[]');
+    jobs = jobs.filter(function(j) { return j.id !== jobId; });
+    localStorage.setItem('sb_posted_jobs', JSON.stringify(jobs));
+    renderPostedJobs();
+    showToast('Job deleted.', 'warn');
+  }
+
+  function doLogout() {
+    localStorage.removeItem('sb_session');
+    window.location.href = 'index.html';
+  }
+</script>
 </body>
 </html>
