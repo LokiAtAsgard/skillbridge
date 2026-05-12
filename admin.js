@@ -1,4 +1,4 @@
-var editingListingId = null; // Tracks which listing  currently editing
+var editingListingId = null;
 var adminAllListings = [];
 var adminAllUsers    = [
   { id:1, name:'Juan dela Cruz',    city:'Batangas City', skills:'Electrical Wiring, Safety Protocols', verified:true  },
@@ -123,12 +123,23 @@ function printAdminTable(tableBodyId, printTitle) {
   printWindow.print();
 }
 
+// ── CHANGED: now deletes from Supabase via API ──
 function confirmDeleteListing(listingId) {
   if (confirm('Delete listing ID ' + listingId + '? This cannot be undone.')) {
-    showToast('Listing ' + listingId + ' deleted.', 'error');
+    fetch('/api/delete-listing?id=' + listingId, { method: 'DELETE' })
+    .then(function(res) { return res.json(); })
+    .then(function() {
+      adminAllListings = adminAllListings.filter(function(l) { return l.id !== String(listingId); });
+      cachedListingsData = adminAllListings;
+      renderAdminListingsTable(adminAllListings);
+      document.getElementById('statTotalListings').textContent = adminAllListings.length;
+      showToast('Listing ' + listingId + ' deleted from database.', 'error');
+    })
+    .catch(function() { showToast('Delete failed. Check connection.', 'error'); });
   }
 }
 
+// ── CHANGED: now saves to Supabase via API ──
 function saveNewListing() {
   var newTitle    = document.getElementById('newTitle').value.trim();
   var newCompany  = document.getElementById('newCompany').value.trim();
@@ -143,32 +154,50 @@ function saveNewListing() {
     return;
   }
 
-  var newListingEntry = {
-    id:       String(adminAllListings.length + 1),
-    title:    newTitle,
-    company:  newCompany,
-    type:     newType,
-    industry: 'general',
-    city:     newCity,
-    allowance:newAllowance || '0',
-    duration: newDuration,
-    slots:    '1',
-    skills:   newSkills,
-    verified: 'false',
-    featured: 'false',
-    status:   'active',
-    posted:   new Date().toISOString().split('T')[0],
-    icon:     '&#128188;'
-  };
-
-  adminAllListings.push(newListingEntry);
-  renderAdminListingsTable(adminAllListings);
-  document.getElementById('statTotalListings').textContent = adminAllListings.length;
-  closeModal('addListingModal');
-  showToast('New listing added successfully.');
+  fetch('/api/add-listing', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title:    newTitle,
+      company:  newCompany,
+      type:     newType,
+      city:     newCity,
+      allowance:newAllowance,
+      duration: newDuration,
+      skills:   newSkills,
+      industry: 'general',
+      slots:    1,
+      icon:     '&#128188;'
+    })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(newListing) {
+    var mapped = {
+      id:        String(newListing.id),
+      title:     newListing.title,
+      company:   newListing.company,
+      type:      newListing.type,
+      industry:  newListing.industry  || 'general',
+      city:      newListing.city,
+      allowance: String(newListing.allowance),
+      duration:  newListing.duration,
+      slots:     String(newListing.slots),
+      skills:    newListing.skills,
+      verified:  'false',
+      featured:  'false',
+      status:    'active',
+      posted:    newListing.posted,
+      icon:      newListing.icon
+    };
+    adminAllListings.push(mapped);
+    cachedListingsData = adminAllListings;
+    renderAdminListingsTable(adminAllListings);
+    document.getElementById('statTotalListings').textContent = adminAllListings.length;
+    closeModal('addListingModal');
+    showToast('New listing saved to database.');
+  })
+  .catch(function() { showToast('Failed to save. Check connection.', 'error'); });
 }
-
-
 
 function importXMLFile() {
   var fileInput = document.getElementById('xmlImportFile');
