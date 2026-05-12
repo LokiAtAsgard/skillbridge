@@ -5,10 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Matches — SkillBridge</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    .match-card{background:var(--white);border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:16px;}
+    .match-card.is-matched{border:2px solid var(--green-main);}
+    .chat-box{background:var(--surface);border-radius:10px;padding:16px;margin-top:16px;max-height:300px;overflow-y:auto;}
+    .msg-row{margin-bottom:12px;}
+    .msg-bubble{display:inline-block;padding:8px 14px;border-radius:12px;font-size:14px;max-width:80%;}
+    .msg-mine{background:var(--green-main);color:#fff;float:right;clear:both;}
+    .msg-theirs{background:#e5e7eb;color:var(--text-primary);float:left;clear:both;}
+    .msg-sender{font-size:11px;color:var(--text-muted);margin-bottom:3px;}
+    .interview-bubble{background:#fef9c3;border:1px solid #fbbf24;border-radius:10px;padding:12px 16px;margin-top:12px;font-size:13px;}
+    .clearfix::after{content:'';display:block;clear:both;}
+  </style>
 </head>
 <body>
-
 <nav class="navbar" id="mainNavbar">
   <div class="nav-container">
     <a href="index.html" class="nav-logo">Skill<span>Bridge</span></a>
@@ -17,12 +28,8 @@
       <li><a href="listings.html" class="nav-link">Browse Jobs</a></li>
       <li><a href="matches.html" class="nav-link active">My Matches</a></li>
       <li><a href="employers.html" class="nav-link">For Employers</a></li>
-      <li><a href="admin.html" class="nav-link">Admin</a></li>
     </ul>
-    <div class="nav-actions">
-      <a href="#" class="btn-outline-small">Log In</a>
-      <a href="#" class="btn-primary-small">Sign Up Free</a>
-    </div>
+    <div class="nav-actions" id="navActions"></div>
     <button class="nav-hamburger" onclick="toggleMobileNav()">&#9776;</button>
   </div>
 </nav>
@@ -30,144 +37,186 @@
 <div class="page-header-bar">
   <div class="page-header-container">
     <h1 class="page-title">My Matches</h1>
-    <p class="page-subtitle">Listings where both you and the employer swiped up. Contact is now unlocked.</p>
+    <p class="page-subtitle" id="matchSubtitle">Loading...</p>
   </div>
 </div>
 
-<main style="padding: 48px 0 80px; background: var(--surface); min-height: 60vh;">
-  <div style="max-width: 1280px; margin: 0 auto; padding: 0 24px;">
-
-    <!-- Not logged in state -->
-    <div id="notLoggedInState" style="text-align: center; padding: 80px 24px;">
-      <div style="font-size: 56px; margin-bottom: 20px;">🔒</div>
-      <h2 style="font-family: 'Playfair Display', serif; font-size: 28px; color: var(--text-primary); margin-bottom: 12px;">
-        You need an account to see your matches
-      </h2>
-      <p style="font-size: 15px; color: var(--text-muted); max-width: 420px; margin: 0 auto 28px; line-height: 1.65;">
-        Create a free profile, add your skills, and start swiping. When an employer also swipes up on you, it is a match and you can start chatting.
-      </p>
-      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+<main style="padding:48px 0 80px;background:var(--surface);min-height:60vh;">
+  <div style="max-width:760px;margin:0 auto;padding:0 24px;">
+    <div id="notLoggedIn" style="display:none;text-align:center;padding:80px 24px;">
+      <div style="font-size:56px;margin-bottom:20px;">🔒</div>
+      <h2 style="font-family:'DM Sans',sans-serif;font-size:24px;color:var(--text-primary);margin-bottom:12px;">Log in to see your matches</h2>
+      <p style="color:var(--text-muted);max-width:400px;margin:0 auto 28px;">Create a profile, swipe on listings, and matches will appear here.</p>
+      <div style="display:flex;gap:12px;justify-content:center;">
         <a href="listings.html" class="btn-primary-large">Browse Listings</a>
-        <a href="#" class="btn-outline-large">Create Profile</a>
+        <a href="login.html" class="btn-outline-large">Log In</a>
       </div>
     </div>
-
-    <!-- Sample matched state (shown as demo) -->
-    <div id="matchesDemoState" style="display: none;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
-        <div style="font-size: 14px; color: var(--text-muted);" id="matchCount">3 matches found</div>
-        <button class="btn-outline-small" onclick="window.print()">&#128424; Print</button>
-      </div>
-      <div class="job-cards-grid" id="matchesGrid"></div>
-    </div>
-
-    <!-- Toggle demo button -->
-    <div style="text-align: center; margin-top: 40px;">
-      <button class="btn-text-small" onclick="toggleMatchDemo()" id="demoToggleBtn">
-        Show Demo Matches
-      </button>
-    </div>
-
+    <div id="matchesList"></div>
   </div>
 </main>
 
-<!-- How matches work -->
-<section style="padding: 64px 0; background: var(--white);">
-  <div class="section-container">
-    <div class="section-header">
-      <div class="section-eyebrow">How It Works</div>
-      <h2 class="section-headline">How Matches Happen</h2>
-    </div>
-    <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-number">01</div>
-        <div class="step-icon">&#8593;</div>
-        <h3 class="step-title">You Swipe Up</h3>
-        <p class="step-detail">On the Browse page, swipe up or click Interested on any listing you want to connect with.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-number">02</div>
-        <div class="step-icon">&#9889;</div>
-        <h3 class="step-title">Employer Swipes Up</h3>
-        <p class="step-detail">The employer reviews your profile and also swipes up. Both sides have to be interested for a match to happen.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-number">03</div>
-        <div class="step-icon">&#128172;</div>
-        <h3 class="step-title">Chat Unlocks</h3>
-        <p class="step-detail">Once matched, contact information is revealed and you can message each other directly to schedule an interview.</p>
-      </div>
-    </div>
+<!-- Congratulations modal -->
+<div id="congratsModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box" style="text-align:center;max-width:400px;">
+    <div style="font-size:56px;margin-bottom:12px;">🎉</div>
+    <h2 style="font-size:24px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">It's a Match!</h2>
+    <p style="color:var(--text-muted);margin-bottom:24px;">Both you and the employer are interested. You can now chat and arrange an interview.</p>
+    <button class="btn-primary-small" onclick="closeModal('congratsModal')">Start Chatting</button>
   </div>
-</section>
+</div>
 
-<footer class="site-footer">
-  <div class="footer-container">
-    <div class="footer-bottom">
-      <p>2024 SkillBridge. BSIT IT3A — Technopreneurship. Developed by Manhic, Orlanes, and Ramos.</p>
+<!-- Interview offer modal (employer) -->
+<div id="interviewModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box" style="max-width:400px;">
+    <div class="modal-header">
+      <h3 class="modal-title">Offer Interview Schedule</h3>
+      <button class="modal-close-btn" onclick="closeModal('interviewModal')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Date</label><input type="date" class="form-input" id="interviewDate"></div>
+      <div class="form-group"><label class="form-label">Time</label><input type="time" class="form-input" id="interviewTime"></div>
+      <div class="form-group"><label class="form-label">Message</label><input type="text" class="form-input" id="interviewMsg" placeholder="Please come prepared with your documents."></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline-small" onclick="closeModal('interviewModal')">Cancel</button>
+      <button class="btn-primary-small" onclick="sendInterviewOffer()">Send Offer</button>
     </div>
   </div>
-</footer>
+</div>
 
 <script src="main.js"></script>
-<script src="xml-loader.js"></script>
 <script>
-  var demoVisible = false;
+  var SUPABASE_URL  = 'https://mrjpkviryziixphuhmdp.supabase.co/rest/v1/';
+  var SUPABASE_ANON = 'sb_publishable_7X6EhP6OU_bzbBc_hYiO0g_fVtru7nx';
+  var session       = JSON.parse(localStorage.getItem('sb_session') || 'null');
+  var currentProfile = null;
+  var activeMatchId  = null;
 
-  function toggleMatchDemo() {
-    demoVisible = !demoVisible;
-    var notLoggedIn = document.getElementById('notLoggedInState');
-    var demoState   = document.getElementById('matchesDemoState');
-    var demoBtn     = document.getElementById('demoToggleBtn');
+  function getToken() { return session ? session.access_token : null; }
 
-    if (demoVisible) {
-      notLoggedIn.style.display = 'none';
-      demoState.style.display   = 'block';
-      demoBtn.textContent       = 'Hide Demo';
-      loadDemoMatches();
+  window.addEventListener('DOMContentLoaded', function() {
+    var navActions = document.getElementById('navActions');
+    if (session && session.access_token) {
+      navActions.innerHTML = '<a href="profile.html" class="btn-outline-small">My Profile</a>&nbsp;<button class="btn-primary-small" onclick="doLogout()">Log Out</button>';
+      fetch('/api/auth-profile', { headers: { 'Authorization': 'Bearer ' + getToken() } })
+      .then(function(r) { return r.json(); })
+      .then(function(p) {
+        currentProfile = p;
+        document.getElementById('matchSubtitle').textContent =
+          p.role === 'employer' ? 'Youth applicants who expressed interest in your listings.' : 'Listings where both you and the employer swiped up.';
+        loadMatches();
+      });
     } else {
-      notLoggedIn.style.display = 'block';
-      demoState.style.display   = 'none';
-      demoBtn.textContent       = 'Show Demo Matches';
+      document.getElementById('notLoggedIn').style.display = 'block';
+      document.getElementById('matchSubtitle').textContent = 'Log in to see your matches.';
     }
+  });
+
+  function doLogout() { localStorage.removeItem('sb_session'); window.location.href = 'index.html'; }
+
+  function loadMatches() {
+    fetch('/api/matches', { headers: { 'Authorization': 'Bearer ' + getToken() } })
+    .then(function(r) { return r.json(); })
+    .then(function(matches) {
+      var list = document.getElementById('matchesList');
+      if (!matches.length) {
+        list.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-muted);">No matches yet. Go browse listings and swipe up on ones you like!</div>';
+        return;
+      }
+      list.innerHTML = matches.map(function(m) { return buildMatchCard(m); }).join('');
+    });
   }
 
-  function loadDemoMatches() {
-    loadXMLListings(function(allListings) {
-      var demoMatches = allListings.filter(function(item) {
-        return item.featured === 'true';
-      }).slice(0, 3);
+  function buildMatchCard(m) {
+    var listing  = m.listings || {};
+    var isMatched = m.matched;
+    var matchedBadge = isMatched ? '<span style="background:#dcfce7;color:#15803d;font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;">&#10084; Matched</span>' : '<span style="background:#fef9c3;color:#92400e;font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;">&#9203; Pending</span>';
 
-      var matchesGrid = document.getElementById('matchesGrid');
-      matchesGrid.innerHTML = demoMatches.map(function(listing) {
-        var skillTagsHTML = listing.skills.split(',').map(function(skill) {
-          return '<span class="card-skill-tag">' + skill.trim() + '</span>';
-        }).join('');
+    var otherParty = currentProfile.role === 'employee' ? (m.employer || {}) : (m.employee || {});
 
-        return '<div class="job-card-item">' +
-          '<div class="card-banner-area">' + listing.icon +
-          '<span class="card-verified-tag">&#10003; PESO</span>' +
-          '<span class="card-featured-tag" style="background: var(--green-main);">&#10084; Matched</span>' +
-          '</div>' +
-          '<div class="card-body-area">' +
-          '<span class="card-type-badge' + (listing.type === 'internship' ? ' internship-badge' : '') + '">' + listing.type + '</span>' +
-          '<div class="card-company">' + listing.company + '</div>' +
-          '<div class="card-title">' + listing.title + '</div>' +
-          '<div class="card-location">&#128205; ' + listing.city + '</div>' +
-          '<div class="card-skills">' + skillTagsHTML + '</div>' +
-          '<div class="card-stats">' +
-          '<div><div class="card-stat-val">' + formatCurrency(listing.allowance) + '</div><div class="card-stat-key">Per Day</div></div>' +
-          '<div><div class="card-stat-val">' + listing.duration + '</div><div class="card-stat-key">Duration</div></div>' +
-          '</div>' +
-          '</div>' +
-          '<div class="card-action-row">' +
-          '<button class="card-act-btn" style="background:#dbeafe;color:#1d4ed8;flex:2;" onclick="showToast(\'Chat feature requires account login.\')">&#128172; Message Employer</button>' +
-          '<button class="card-act-btn card-act-save" onclick="showToast(\'Interview scheduled!\')">&#128197; Schedule</button>' +
-          '</div></div>';
+    var chatHTML = '';
+    if (isMatched) {
+      var msgs = (m.messages || []).map(function(msg) {
+        var isMine = msg.sender_id === session.user.id;
+        if (msg.is_interview_offer) {
+          return '<div class="interview-bubble">&#128197; <strong>Interview Offer:</strong> ' + msg.interview_date + ' at ' + msg.interview_time + '<br><span style="color:var(--text-muted);">' + msg.content + '</span></div>';
+        }
+        return '<div class="msg-row clearfix"><div class="' + (isMine ? 'msg-mine' : 'msg-theirs') + ' msg-bubble">' +
+          (!isMine ? '<div class="msg-sender">' + (msg.sender ? msg.sender.full_name : '') + '</div>' : '') +
+          msg.content + '</div></div>';
       }).join('');
 
-      document.getElementById('matchCount').textContent = demoMatches.length + ' demo matches shown';
+      var interviewBtn = currentProfile.role === 'employer'
+        ? '<button class="btn-outline-small" onclick="openInterviewModal(' + m.id + ')" style="margin-left:8px;">&#128197; Offer Interview</button>'
+        : '';
+
+      chatHTML = '<div class="chat-box" id="chatBox_' + m.id + '">' + (msgs || '<div style="color:var(--text-muted);text-align:center;padding:20px;font-size:13px;">No messages yet. Say hello!</div>') + '</div>' +
+        '<div style="display:flex;gap:8px;margin-top:10px;">' +
+        '<input type="text" class="form-input" id="msgInput_' + m.id + '" placeholder="Type a message..." style="flex:1;" onkeydown="if(event.key===\'Enter\')sendMessage(' + m.id + ')">' +
+        '<button class="btn-primary-small" onclick="sendMessage(' + m.id + ')">Send</button>' +
+        interviewBtn +
+        '</div>';
+    }
+
+    var approveBtn = '';
+    if (currentProfile.role === 'employer' && m.employee_interested && !m.employer_interested) {
+      approveBtn = '<button class="btn-primary-small" onclick="approveMatch(' + m.id + ')">&#10003; Approve Match</button>';
+    }
+
+    return '<div class="match-card' + (isMatched ? ' is-matched' : '') + '">' +
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">' +
+      '<div style="font-size:32px;">' + (listing.icon || '💼') + '</div>' +
+      '<div style="flex:1;">' +
+      '<div style="font-weight:700;font-size:16px;color:var(--text-primary);">' + (listing.title || 'Listing') + '</div>' +
+      '<div style="font-size:13px;color:var(--text-muted);">' + (listing.company || '') + ' · ' + (listing.city || '') + '</div>' +
+      '<div style="font-size:13px;color:var(--text-muted);margin-top:2px;">With: ' + (otherParty.full_name || otherParty.company_name || 'Unknown') + '</div>' +
+      '</div>' + matchedBadge + '</div>' +
+      approveBtn + chatHTML + '</div>';
+  }
+
+  function approveMatch(matchId) {
+    fetch('/api/matches', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+      body: JSON.stringify({ match_id: matchId })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(updated) {
+      if (updated.matched) openModal('congratsModal');
+      loadMatches();
     });
+  }
+
+  function sendMessage(matchId) {
+    var input   = document.getElementById('msgInput_' + matchId);
+    var content = input.value.trim();
+    if (!content) return;
+    input.value = '';
+    fetch('/api/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+      body: JSON.stringify({ match_id: matchId, content: content })
+    })
+    .then(function() { loadMatches(); });
+  }
+
+  function openInterviewModal(matchId) {
+    activeMatchId = matchId;
+    openModal('interviewModal');
+  }
+
+  function sendInterviewOffer() {
+    var date = document.getElementById('interviewDate').value;
+    var time = document.getElementById('interviewTime').value;
+    var msg  = document.getElementById('interviewMsg').value.trim() || 'Please come prepared with your documents.';
+    if (!date || !time) { showToast('Please set a date and time.', 'error'); return; }
+    fetch('/api/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+      body: JSON.stringify({ match_id: activeMatchId, content: msg, interview_date: date, interview_time: time, is_interview_offer: true })
+    })
+    .then(function() { closeModal('interviewModal'); loadMatches(); showToast('Interview offer sent!'); });
   }
 </script>
 </body>

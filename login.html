@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — SkillBridge</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar" id="mainNavbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Skill<span>Bridge</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="listings.html" class="nav-link">Browse Jobs</a></li>
+    </ul>
+    <button class="nav-hamburger" onclick="toggleMobileNav()">&#9776;</button>
+  </div>
+</nav>
+
+<main style="min-height:80vh;display:flex;align-items:center;justify-content:center;background:var(--surface);padding:40px 24px;">
+  <div style="background:var(--white);border-radius:16px;padding:40px;width:100%;max-width:420px;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="font-size:36px;margin-bottom:8px;">&#128274;</div>
+      <h1 style="font-size:24px;font-weight:700;color:var(--text-primary);margin:0 0 6px;">Welcome back</h1>
+      <p style="color:var(--text-muted);font-size:14px;margin:0;">Log in to your SkillBridge account</p>
+    </div>
+
+    <div id="loginError" style="display:none;background:#fef2f2;color:#dc2626;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;"></div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" id="loginEmail" placeholder="you@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" class="form-input" id="loginPassword" placeholder="Your password">
+    </div>
+    <button class="btn-primary-full" onclick="doLogin()" id="loginBtn" style="margin-top:8px;">Log In</button>
+
+    <p style="text-align:center;margin-top:20px;font-size:14px;color:var(--text-muted);">
+      No account yet? <a href="register.html" style="color:var(--green-main);font-weight:600;">Sign up free</a>
+    </p>
+  </div>
+</main>
+
+<script src="main.js"></script>
+<script>
+  var SUPABASE_URL  = 'https://mrjpkviryziixphuhmdp.supabase.co/rest/v1/';
+  var SUPABASE_ANON = 'sb_publishable_7X6EhP6OU_bzbBc_hYiO0g_fVtru7nx';
+
+  // Redirect if already logged in
+  var saved = localStorage.getItem('sb_session');
+  if (saved) { var s = JSON.parse(saved); if (s.access_token) window.location.href = 'profile.html'; }
+
+  function doLogin() {
+    var email    = document.getElementById('loginEmail').value.trim();
+    var password = document.getElementById('loginPassword').value;
+    var btn      = document.getElementById('loginBtn');
+    var errBox   = document.getElementById('loginError');
+    errBox.style.display = 'none';
+    if (!email || !password) { errBox.textContent = 'Please enter your email and password.'; errBox.style.display = 'block'; return; }
+    btn.textContent = 'Logging in...';
+    btn.disabled = true;
+
+    fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
+      body: JSON.stringify({ email: email, password: password })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error || !data.access_token) {
+        errBox.textContent = data.error_description || 'Login failed. Check your email and password.';
+        errBox.style.display = 'block';
+        btn.textContent = 'Log In'; btn.disabled = false; return;
+      }
+      localStorage.setItem('sb_session', JSON.stringify(data));
+      window.location.href = 'profile.html';
+    })
+    .catch(function() {
+      errBox.textContent = 'Connection error. Try again.';
+      errBox.style.display = 'block';
+      btn.textContent = 'Log In'; btn.disabled = false;
+    });
+  }
+
+  document.addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>

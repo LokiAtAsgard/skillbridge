@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — SkillBridge</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar" id="mainNavbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Skill<span>Bridge</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="listings.html" class="nav-link">Browse Jobs</a></li>
+    </ul>
+    <button class="nav-hamburger" onclick="toggleMobileNav()">&#9776;</button>
+  </div>
+</nav>
+
+<main style="min-height:80vh;display:flex;align-items:center;justify-content:center;background:var(--surface);padding:40px 24px;">
+  <div style="background:var(--white);border-radius:16px;padding:40px;width:100%;max-width:480px;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:36px;margin-bottom:8px;">&#127881;</div>
+      <h1 style="font-size:24px;font-weight:700;color:var(--text-primary);margin:0 0 6px;">Create your account</h1>
+      <p style="color:var(--text-muted);font-size:14px;margin:0;">Join SkillBridge for free</p>
+    </div>
+
+    <!-- Step 1: Role selection -->
+    <div id="step1">
+      <p style="font-weight:600;color:var(--text-primary);margin-bottom:14px;text-align:center;">I am registering as a...</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px;">
+        <button onclick="selectRole('employee')" id="roleEmployee"
+          style="padding:20px;border:2px solid var(--border);border-radius:12px;background:var(--white);cursor:pointer;text-align:center;transition:all .2s;">
+          <div style="font-size:32px;margin-bottom:8px;">&#128100;</div>
+          <div style="font-weight:700;color:var(--text-primary);">Youth / Employee</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Looking for apprenticeship or internship</div>
+        </button>
+        <button onclick="selectRole('employer')" id="roleEmployer"
+          style="padding:20px;border:2px solid var(--border);border-radius:12px;background:var(--white);cursor:pointer;text-align:center;transition:all .2s;">
+          <div style="font-size:32px;margin-bottom:8px;">&#127963;</div>
+          <div style="font-weight:700;color:var(--text-primary);">Employer / Company</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Posting apprenticeships or internships</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Form (hidden until role selected) -->
+    <div id="step2" style="display:none;">
+      <div id="regError" style="display:none;background:#fef2f2;color:#dc2626;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:10px 14px;background:var(--surface);border-radius:8px;">
+        <span id="roleIcon" style="font-size:20px;"></span>
+        <span id="roleLabel" style="font-weight:600;color:var(--text-primary);font-size:14px;"></span>
+        <button onclick="resetRole()" style="margin-left:auto;font-size:12px;color:var(--green-main);background:none;border:none;cursor:pointer;">Change</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" id="nameLabel">Full Name</label>
+        <input type="text" class="form-input" id="regName" placeholder="Juan dela Cruz">
+      </div>
+      <div id="companyFields" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Company Name</label>
+          <input type="text" class="form-input" id="regCompany" placeholder="Santos Electric Services">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Industry</label>
+          <select class="form-input" id="regIndustry">
+            <option value="">Select industry</option>
+            <option value="electrical">Electrical</option>
+            <option value="automotive">Automotive</option>
+            <option value="construction">Construction</option>
+            <option value="it">Information Technology</option>
+            <option value="food">Food Service</option>
+            <option value="manufacturing">Manufacturing</option>
+            <option value="retail">Retail</option>
+            <option value="healthcare">Healthcare</option>
+          </select>
+        </div>
+      </div>
+      <div id="employeeFields" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Skills (comma-separated)</label>
+          <input type="text" class="form-input" id="regSkills" placeholder="Electrical Wiring, Safety Protocols">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">City</label>
+        <select class="form-input" id="regCity">
+          <option value="">Select city</option>
+          <option>Batangas City</option><option>Lipa City</option><option>Calamba</option>
+          <option>Santa Rosa</option><option>Antipolo</option><option>Lucena</option>
+          <option>Tanauan</option><option>Cabuyao</option><option>Santo Tomas</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bio</label>
+        <input type="text" class="form-input" id="regBio" placeholder="Short description about yourself or company">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="regEmail" placeholder="you@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="regPassword" placeholder="At least 6 characters">
+      </div>
+      <button class="btn-primary-full" onclick="doRegister()" id="regBtn" style="margin-top:8px;">Create Account</button>
+    </div>
+
+    <p style="text-align:center;margin-top:20px;font-size:14px;color:var(--text-muted);">
+      Already have an account? <a href="login.html" style="color:var(--green-main);font-weight:600;">Log in</a>
+    </p>
+  </div>
+</main>
+
+<script src="main.js"></script>
+<script>
+  var SUPABASE_URL  = 'https://mrjpkviryziixphuhmdp.supabase.co/rest/v1/';
+  var SUPABASE_ANON = 'sb_publishable_7X6EhP6OU_bzbBc_hYiO0g_fVtru7nx';
+  var selectedRole  = null;
+
+  function selectRole(role) {
+    selectedRole = role;
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    document.getElementById('roleIcon').textContent  = role === 'employee' ? '👤' : '🏢';
+    document.getElementById('roleLabel').textContent = role === 'employee' ? 'Registering as Youth / Employee' : 'Registering as Employer / Company';
+    document.getElementById('nameLabel').textContent = role === 'employee' ? 'Full Name' : 'Contact Person Name';
+    document.getElementById('companyFields').style.display  = role === 'employer' ? 'block' : 'none';
+    document.getElementById('employeeFields').style.display = role === 'employee' ? 'block' : 'none';
+  }
+
+  function resetRole() {
+    selectedRole = null;
+    document.getElementById('step1').style.display = 'block';
+    document.getElementById('step2').style.display = 'none';
+  }
+
+  function doRegister() {
+    var name     = document.getElementById('regName').value.trim();
+    var email    = document.getElementById('regEmail').value.trim();
+    var password = document.getElementById('regPassword').value;
+    var city     = document.getElementById('regCity').value;
+    var bio      = document.getElementById('regBio').value.trim();
+    var skills   = selectedRole === 'employee' ? document.getElementById('regSkills').value.trim() : null;
+    var company  = selectedRole === 'employer' ? document.getElementById('regCompany').value.trim() : null;
+    var industry = selectedRole === 'employer' ? document.getElementById('regIndustry').value : null;
+    var errBox   = document.getElementById('regError');
+    var btn      = document.getElementById('regBtn');
+    errBox.style.display = 'none';
+
+    if (!name || !email || !password || !city) {
+      errBox.textContent = 'Please fill in all required fields.';
+      errBox.style.display = 'block'; return;
+    }
+    if (password.length < 6) {
+      errBox.textContent = 'Password must be at least 6 characters.';
+      errBox.style.display = 'block'; return;
+    }
+
+    btn.textContent = 'Creating account...'; btn.disabled = true;
+
+    fetch(SUPABASE_URL + '/auth/v1/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
+      body: JSON.stringify({ email: email, password: password })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(authData) {
+      if (authData.error || !authData.access_token) {
+        errBox.textContent = authData.msg || authData.error_description || 'Registration failed.';
+        errBox.style.display = 'block';
+        btn.textContent = 'Create Account'; btn.disabled = false; return;
+      }
+      localStorage.setItem('sb_session', JSON.stringify(authData));
+      return fetch('/api/auth-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authData.access_token },
+        body: JSON.stringify({ role: selectedRole, full_name: name, city: city, bio: bio, skills: skills, company_name: company, company_industry: industry })
+      });
+    })
+    .then(function(r) { if (r) return r.json(); })
+    .then(function() { window.location.href = 'profile.html'; })
+    .catch(function() {
+      errBox.textContent = 'Connection error. Try again.';
+      errBox.style.display = 'block';
+      btn.textContent = 'Create Account'; btn.disabled = false;
+    });
+  }
+</script>
+</body>
+</html>

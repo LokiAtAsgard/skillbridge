@@ -9,6 +9,39 @@
 </head>
 <body class="admin-body">
 
+  <div id="adminGate" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:40px;width:100%;max-width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+    <div style="font-size:40px;margin-bottom:12px;">🔐</div>
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:6px;">Admin Access</h2>
+    <p style="font-size:13px;color:#6b7280;margin-bottom:20px;">Enter the admin password to continue.</p>
+    <input type="password" id="adminPwInput" placeholder="Password"
+      style="width:100%;padding:10px 14px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;margin-bottom:10px;box-sizing:border-box;"
+      onkeydown="if(event.key==='Enter')checkAdminPassword()">
+    <div id="adminPwError" style="color:#dc2626;font-size:13px;margin-bottom:10px;display:none;">Incorrect password.</div>
+    <button onclick="checkAdminPassword()"
+      style="width:100%;padding:12px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;">
+      Enter
+    </button>
+  </div>
+</div>
+
+<script>
+  (function() {
+    if (sessionStorage.getItem('admin_authed') === 'yes') {
+      document.getElementById('adminGate').style.display = 'none';
+    }
+  })();
+  function checkAdminPassword() {
+    var pw = document.getElementById('adminPwInput').value;
+    if (pw === 'password123') {
+      sessionStorage.setItem('admin_authed', 'yes');
+      document.getElementById('adminGate').style.display = 'none';
+    } else {
+      document.getElementById('adminPwError').style.display = 'block';
+    }
+  }
+</script>
+
 <nav class="navbar navbar-admin" id="mainNavbar">
   <div class="nav-container">
     <a href="index.html" class="nav-logo">Skill<span>Bridge</span> <span class="admin-tag">Admin</span></a>

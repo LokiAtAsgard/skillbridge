@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile — SkillBridge</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar" id="mainNavbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Skill<span>Bridge</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="listings.html" class="nav-link">Browse Jobs</a></li>
+      <li><a href="matches.html" class="nav-link">My Matches</a></li>
+      <li><a href="employers.html" class="nav-link">For Employers</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn-outline-small" onclick="doLogout()">Log Out</button>
+    </div>
+    <button class="nav-hamburger" onclick="toggleMobileNav()">&#9776;</button>
+  </div>
+</nav>
+
+<main style="min-height:80vh;background:var(--surface);padding:48px 24px;">
+  <div style="max-width:600px;margin:0 auto;">
+
+    <div id="profileLoading" style="text-align:center;padding:60px;">Loading profile...</div>
+
+    <div id="profileView" style="display:none;">
+      <div style="background:var(--white);border-radius:16px;padding:32px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:20px;margin-bottom:24px;">
+          <div style="width:64px;height:64px;border-radius:50%;background:var(--green-main);display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;" id="profileAvatar">👤</div>
+          <div>
+            <h2 style="margin:0 0 4px;font-size:22px;color:var(--text-primary);" id="profileName"></h2>
+            <span id="profileRoleBadge" style="font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;"></span>
+          </div>
+          <button class="btn-outline-small" onclick="showEditForm()" style="margin-left:auto;">Edit Profile</button>
+        </div>
+        <div style="display:grid;gap:12px;">
+          <div><span style="color:var(--text-muted);font-size:13px;">City</span><div style="font-weight:600;" id="profileCity"></div></div>
+          <div id="profileSkillsRow"><span style="color:var(--text-muted);font-size:13px;">Skills</span><div style="font-weight:600;" id="profileSkills"></div></div>
+          <div id="profileCompanyRow"><span style="color:var(--text-muted);font-size:13px;">Company</span><div style="font-weight:600;" id="profileCompany"></div></div>
+          <div><span style="color:var(--text-muted);font-size:13px;">Bio</span><div style="color:var(--text-secondary);" id="profileBio"></div></div>
+        </div>
+      </div>
+
+      <a href="matches.html" class="btn-primary-full" style="display:block;text-align:center;text-decoration:none;padding:14px;">View My Matches</a>
+    </div>
+
+    <!-- Edit form -->
+    <div id="profileEdit" style="display:none;">
+      <div style="background:var(--white);border-radius:16px;padding:32px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+        <h2 style="margin:0 0 24px;font-size:20px;">Edit Profile</h2>
+        <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="editName"></div>
+        <div class="form-group"><label class="form-label">City</label>
+          <select class="form-input" id="editCity">
+            <option>Batangas City</option><option>Lipa City</option><option>Calamba</option>
+            <option>Santa Rosa</option><option>Antipolo</option><option>Lucena</option>
+            <option>Tanauan</option><option>Cabuyao</option><option>Santo Tomas</option>
+          </select>
+        </div>
+        <div class="form-group" id="editSkillsGroup"><label class="form-label">Skills</label><input type="text" class="form-input" id="editSkills"></div>
+        <div class="form-group" id="editCompanyGroup"><label class="form-label">Company Name</label><input type="text" class="form-input" id="editCompany"></div>
+        <div class="form-group"><label class="form-label">Bio</label><input type="text" class="form-input" id="editBio"></div>
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <button class="btn-outline-small" onclick="hideEditForm()">Cancel</button>
+          <button class="btn-primary-small" onclick="saveProfile()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="main.js"></script>
+<script>
+  var SUPABASE_URL  = 'https://mrjpkviryziixphuhmdp.supabase.co/rest/v1/';
+  var SUPABASE_ANON = 'sb_publishable_7X6EhP6OU_bzbBc_hYiO0g_fVtru7nx';
+  var currentProfile = null;
+
+  var session = JSON.parse(localStorage.getItem('sb_session') || 'null');
+  if (!session || !session.access_token) window.location.href = 'login.html';
+
+  function getToken() { return session.access_token; }
+
+  window.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/auth-profile', { headers: { 'Authorization': 'Bearer ' + getToken() } })
+    .then(function(r) { return r.json(); })
+    .then(function(profile) {
+      currentProfile = profile;
+      document.getElementById('profileLoading').style.display = 'none';
+      document.getElementById('profileView').style.display    = 'block';
+      document.getElementById('profileName').textContent  = profile.full_name || 'No name set';
+      document.getElementById('profileCity').textContent  = profile.city || '—';
+      document.getElementById('profileSkills').textContent  = profile.skills || '—';
+      document.getElementById('profileCompany').textContent = profile.company_name || '—';
+      document.getElementById('profileBio').textContent   = profile.bio || '—';
+      document.getElementById('profileAvatar').textContent = profile.role === 'employer' ? '🏢' : '👤';
+      var badge = document.getElementById('profileRoleBadge');
+      badge.textContent = profile.role === 'employer' ? 'Employer' : 'Youth / Employee';
+      badge.style.background = profile.role === 'employer' ? '#dbeafe' : '#dcfce7';
+      badge.style.color      = profile.role === 'employer' ? '#1d4ed8' : '#15803d';
+      document.getElementById('profileSkillsRow').style.display  = profile.role === 'employee' ? '' : 'none';
+      document.getElementById('profileCompanyRow').style.display = profile.role === 'employer' ? '' : 'none';
+    })
+    .catch(function() { window.location.href = 'login.html'; });
+  });
+
+  function showEditForm() {
+    document.getElementById('profileView').style.display = 'none';
+    document.getElementById('profileEdit').style.display = 'block';
+    document.getElementById('editName').value    = currentProfile.full_name || '';
+    document.getElementById('editCity').value    = currentProfile.city || '';
+    document.getElementById('editSkills').value  = currentProfile.skills || '';
+    document.getElementById('editCompany').value = currentProfile.company_name || '';
+    document.getElementById('editBio').value     = currentProfile.bio || '';
+    document.getElementById('editSkillsGroup').style.display  = currentProfile.role === 'employee' ? '' : 'none';
+    document.getElementById('editCompanyGroup').style.display = currentProfile.role === 'employer' ? '' : 'none';
+  }
+
+  function hideEditForm() {
+    document.getElementById('profileEdit').style.display = 'none';
+    document.getElementById('profileView').style.display = 'block';
+  }
+
+  function saveProfile() {
+    fetch('/api/auth-profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+      body: JSON.stringify({
+        full_name:        document.getElementById('editName').value.trim(),
+        city:             document.getElementById('editCity').value,
+        skills:           document.getElementById('editSkills').value.trim(),
+        company_name:     document.getElementById('editCompany').value.trim(),
+        bio:              document.getElementById('editBio').value.trim()
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(updated) {
+      currentProfile = updated;
+      hideEditForm();
+      document.getElementById('profileName').textContent    = updated.full_name || '';
+      document.getElementById('profileCity').textContent    = updated.city || '—';
+      document.getElementById('profileSkills').textContent  = updated.skills || '—';
+      document.getElementById('profileCompany').textContent = updated.company_name || '—';
+      document.getElementById('profileBio').textContent     = updated.bio || '—';
+      showToast('Profile updated successfully.');
+    });
+  }
+
+  function doLogout() {
+    localStorage.removeItem('sb_session');
+    window.location.href = 'index.html';
+  }
+</script>
+</body>
+</html>

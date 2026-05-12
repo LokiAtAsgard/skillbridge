@@ -136,8 +136,22 @@ function renderListingCards(listingsArray, gridElementId) {
 }
 
 function handleCardAction(actionType, listingId) {
+  var session = JSON.parse(localStorage.getItem('sb_session') || 'null');
   if (actionType === 'yes') {
-    showToast('Expressed interest! Waiting for employer match.');
+    if (!session || !session.access_token) {
+      showToast('Please log in to express interest.', 'warn');
+      setTimeout(function() { window.location.href = 'login.html'; }, 1200);
+      return;
+    }
+    // Find employer_id from the listing data
+    var listing = (cachedListingsData || []).find(function(l) { return String(l.id) === String(listingId); });
+    fetch('/api/matches', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ listing_id: parseInt(listingId), employer_id: null })
+    })
+    .then(function() { showToast('Interest recorded! Check My Matches.'); })
+    .catch(function() { showToast('Could not save interest. Try again.', 'error'); });
   } else if (actionType === 'save') {
     toggleBookmark(String(listingId));
   } else if (actionType === 'pass') {
