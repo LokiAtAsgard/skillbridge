@@ -6,7 +6,7 @@ function loadXMLListings(callbackFunction) {
     return;
   }
 
-  fetch('/api/listings')
+  fetch('/api/get-listings')
     .then(function(res) {
       if (!res.ok) throw new Error('API not available');
       return res.json();
