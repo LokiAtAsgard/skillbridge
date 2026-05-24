@@ -1,14 +1,19 @@
-import { createClient } from '@supabase/supabase-js';
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+const { createClient } = require('@supabase/supabase-js');
 
-export default async function handler(req, res) {
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
+
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const token = req.headers.authorization?.replace('Bearer ', '');
+  const token = (req.headers.authorization || '').replace('Bearer ', '');
   if (!token) return res.status(401).json({ error: 'No token' });
+
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: 'Invalid token' });
 
@@ -32,4 +37,4 @@ export default async function handler(req, res) {
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json(data);
   }
-}
+};
