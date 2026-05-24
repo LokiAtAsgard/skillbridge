@@ -1,16 +1,20 @@
-import { createClient } from '@supabase/supabase-js';
-const supabase = createClient(process.env.mrjpkviryziixphuhmdp.supabase.co, process.env.sb_publishable_7X6EhP6OU_bzbBc_hYiO0g_fVtru7nx);
 
-export default async function handler(req, res) {
+const { createClient } = require('@supabase/supabase-js');
+
+const supabase = createClient(
+  process.env.mrjpkviryziixphuhmdp.supabase.co,
+  process.env.sb_publishable_7X6EhP6OU_bzbBc_hYiO0g_fVtru7nx
+);
+
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { search, type, city, industry, allowance, sort, featured } = req.query;
 
   let query = supabase.from('listings').select('*');
 
-  if (search) {
-    query = query.or(`title.ilike.%${search}%,company.ilike.%${search}%,skills.ilike.%${search}%`);
-  }
+  if (search)   query = query.or(`title.ilike.%${search}%,company.ilike.%${search}%,skills.ilike.%${search}%`);
   if (type)     query = query.eq('type', type);
   if (city)     query = query.eq('city', city);
   if (industry) query = query.eq('industry', industry);
@@ -28,4 +32,6 @@ export default async function handler(req, res) {
   const { data, error } = await query;
   if (error) return res.status(500).json({ error: error.message });
   res.status(200).json(data);
-}
+};
+
+
