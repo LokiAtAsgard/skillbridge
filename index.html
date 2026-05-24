@@ -213,27 +213,6 @@
 <script src="xml-loader.js"></script>
 <script src="listings.js"></script>
 
-<script>
-  // Load featured listings on homepage
-  window.addEventListener('DOMContentLoaded', function() {
-    loadXMLListings(function(allListings) {
-      var featuredListings = allListings.filter(function(listingItem) {
-        return listingItem.featured === 'true';
-      });
-      renderListingCards(featuredListings, 'homeListingsGrid');
-    });
-  });
 
-  function filterHomeListings() {
-    var searchText  = document.getElementById('homeSearchInput').value.toLowerCase();
-    var filterType  = document.getElementById('homeFilterType').value;
-    var filterCity  = document.getElementById('homeFilterCity').value;
-    loadXMLListings(function(allListings) {
-      var featured = allListings.filter(function(item) { return item.featured === 'true'; });
-      var filtered = applyListingFilters(featured, searchText, filterType, filterCity, '', '');
-      renderListingCards(filtered, 'homeListingsGrid');
-    });
-  }
-</script>
 </body>
 </html>
