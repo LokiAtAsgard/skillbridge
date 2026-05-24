@@ -1,13 +1,12 @@
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
+  process.env.mrjpkviryziixphuhmdp.supabase.co,
+  process.env.sb_publishable_7X6EhP6OU_bzbBc_hYiO0g_fVtru7nx
 );
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'DELETE') return res.status(405).end();
 
   const { id } = req.query;
@@ -15,4 +14,4 @@ module.exports = async function handler(req, res) {
 
   if (error) return res.status(500).json({ error: error.message });
   res.status(200).json({ success: true });
-};
+}

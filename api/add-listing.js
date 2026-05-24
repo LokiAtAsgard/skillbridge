@@ -1,13 +1,12 @@
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
+  process.env.mrjpkviryziixphuhmdp.supabase.co,
+  process.env.sb_publishable_7X6EhP6OU_bzbBc_hYiO0g_fVtru7nx
 );
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
   const { title, company, type, industry, city, allowance, duration, slots, skills, icon } = req.body;
@@ -19,16 +18,12 @@ module.exports = async function handler(req, res) {
   const { data, error } = await supabase.from('listings').insert([{
     title, company, type, industry, city,
     allowance: parseInt(allowance) || 0,
-    duration,
-    slots: parseInt(slots) || 1,
-    skills,
-    icon: icon || '💼',
-    verified: false,
-    featured: false,
-    status: 'active',
+    duration, slots: parseInt(slots) || 1,
+    skills, icon: icon || '💼',
+    verified: false, featured: false, status: 'active',
     posted: new Date().toISOString().split('T')[0]
-  }]).select().single();
+  }]).select();
 
   if (error) return res.status(500).json({ error: error.message });
-  res.status(200).json(data);
-};
+  res.status(200).json(data[0]);
+}
