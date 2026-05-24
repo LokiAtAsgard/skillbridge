@@ -1,168 +1,154 @@
 var cachedListingsData = null;
 
-function loadXMLListings(callbackFunction) {
-  if (cachedListingsData) {
+function loadListings(callbackFunction, params) {
+  var query = params || {};
+
+  // If we have cache and no specific params, use cache
+  if (cachedListingsData && !params) {
     callbackFunction(cachedListingsData);
     return;
   }
 
-  fetch('/api/get-listings')
+  var queryString = Object.keys(query).map(function(k) {
+    return encodeURIComponent(k) + '=' + encodeURIComponent(query[k]);
+  }).join('&');
+
+  fetch('/api/get-listings' + (queryString ? '?' + queryString : ''))
     .then(function(res) {
-      if (!res.ok) throw new Error('API not available');
+      if (!res.ok) throw new Error('API error');
       return res.json();
     })
     .then(function(rows) {
-      var listings = rows.map(function(r) {
-        return {
-          id:        String(r.id),
-          title:     r.title     || '',
-          company:   r.company   || '',
-          type:      r.type      || '',
-          industry:  r.industry  || '',
-          city:      r.city      || '',
-          allowance: String(r.allowance || 0),
-          duration:  r.duration  || '',
-          slots:     String(r.slots || 1),
-          skills:    r.skills    || '',
-          verified:  r.verified  ? 'true' : 'false',
-          featured:  r.featured  ? 'true' : 'false',
-          status:    r.status    || 'active',
-          posted:    r.posted    || '',
-          icon:      r.icon      || '💼'
-        };
-      });
-      cachedListingsData = listings;
+      var listings = rows.map(mapRow);
+      if (!params) cachedListingsData = listings;
       callbackFunction(listings);
     })
-    .catch(function() {
-      console.warn('API unavailable, falling back to XML.');
-      loadFromXML(callbackFunction);
+    .catch(function(err) {
+      console.error('Failed to load listings:', err);
+      callbackFunction(getFallbackListings());
     });
 }
 
-function loadFromXML(callbackFunction) {
-  var xmlRequest = new XMLHttpRequest();
-  xmlRequest.open('GET', 'xml/listings.xml', true);
-  xmlRequest.onload = function() {
-    if (xmlRequest.status === 200) {
-      var parsedXMLDoc = xmlRequest.responseXML;
-      var listingNodes = parsedXMLDoc.getElementsByTagName('listing');
-      var allListings  = [];
-      for (var i = 0; i < listingNodes.length; i++) {
-        var n = listingNodes[i];
-        allListings.push({
-          id:        n.getAttribute('id'),
-          title:     getXMLText(n, 'title'),
-          company:   getXMLText(n, 'company'),
-          type:      getXMLText(n, 'type'),
-          industry:  getXMLText(n, 'industry'),
-          city:      getXMLText(n, 'city'),
-          allowance: getXMLText(n, 'allowance'),
-          duration:  getXMLText(n, 'duration'),
-          slots:     getXMLText(n, 'slots'),
-          skills:    getXMLText(n, 'skills'),
-          verified:  getXMLText(n, 'verified'),
-          featured:  getXMLText(n, 'featured'),
-          status:    getXMLText(n, 'status'),
-          posted:    getXMLText(n, 'posted'),
-          icon:      getXMLText(n, 'icon')
-        });
-      }
-      cachedListingsData = allListings;
-      callbackFunction(allListings);
-    }
-  };
-  xmlRequest.onerror = function() {
-    callbackFunction(getFallbackListings());
-  };
-  xmlRequest.send();
+// Keep loadXMLListings as an alias so existing pages still work
+function loadXMLListings(cb) {
+  loadListings(cb);
 }
 
-function getXMLText(parentNode, tagName) {
-  var foundElements = parentNode.getElementsByTagName(tagName);
-  return foundElements.length > 0 ? foundElements[0].textContent.trim() : '';
+function mapRow(r) {
+  return {
+    id:        String(r.id),
+    title:     r.title     || '',
+    company:   r.company   || '',
+    type:      r.type      || '',
+    industry:  r.industry  || '',
+    city:      r.city      || '',
+    allowance: String(r.allowance || 0),
+    duration:  r.duration  || '',
+    slots:     String(r.slots || 1),
+    skills:    r.skills    || '',
+    verified:  r.verified  ? 'true' : 'false',
+    featured:  r.featured  ? 'true' : 'false',
+    status:    r.status    || 'active',
+    posted:    r.posted    || '',
+    icon:      r.icon      || '💼'
+  };
 }
 
 function applyListingFilters(listingsArray, searchText, typeFilter, cityFilter, industryFilter, allowanceFilter) {
-  return listingsArray.filter(function(listingItem) {
-    var searchLower    = searchText.toLowerCase();
-    var matchesSearch  = !searchText ||
-      listingItem.title.toLowerCase().includes(searchLower) ||
-      listingItem.company.toLowerCase().includes(searchLower) ||
-      listingItem.skills.toLowerCase().includes(searchLower);
-    var matchesType     = !typeFilter     || listingItem.type     === typeFilter;
-    var matchesCity     = !cityFilter     || listingItem.city     === cityFilter;
-    var matchesIndustry = !industryFilter || listingItem.industry === industryFilter;
-    var matchesAllowance= !allowanceFilter|| parseInt(listingItem.allowance) >= parseInt(allowanceFilter);
-    return matchesSearch && matchesType && matchesCity && matchesIndustry && matchesAllowance;
+  return listingsArray.filter(function(l) {
+    var s = (searchText || '').toLowerCase();
+    var matchSearch   = !s || l.title.toLowerCase().includes(s) || l.company.toLowerCase().includes(s) || l.skills.toLowerCase().includes(s);
+    var matchType     = !typeFilter     || l.type     === typeFilter;
+    var matchCity     = !cityFilter     || l.city     === cityFilter;
+    var matchIndustry = !industryFilter || l.industry === industryFilter;
+    var matchAllowance= !allowanceFilter|| parseInt(l.allowance) >= parseInt(allowanceFilter);
+    return matchSearch && matchType && matchCity && matchIndustry && matchAllowance;
   });
 }
 
-function buildJobCardHTML(listingItem) {
-  var skillTagsHTML  = listingItem.skills.split(',').map(function(skillName) {
-    return '<span class="card-skill-tag">' + skillName.trim() + '</span>';
+function buildJobCardHTML(l) {
+  var skillsHTML = l.skills.split(',').map(function(s) {
+    return '<span class="card-skill-tag">' + s.trim() + '</span>';
   }).join('');
-  var typeBadgeClass = listingItem.type === 'internship' ? 'card-type-badge internship-badge' : 'card-type-badge';
-  var featuredHTML   = listingItem.featured === 'true' ? '<span class="card-featured-tag">Featured</span>' : '';
-  var verifiedHTML   = listingItem.verified === 'true' ? '<span class="card-verified-tag">&#10003; PESO</span>' : '';
-  return '<div class="job-card-item' + (listingItem.featured === 'true' ? ' is-featured' : '') + '" data-id="' + listingItem.id + '">' +
-    '<div class="card-banner-area">' + listingItem.icon + featuredHTML + verifiedHTML + '</div>' +
+  var typeCls    = l.type === 'internship' ? 'card-type-badge internship-badge' : 'card-type-badge';
+  var featuredHTML = l.featured === 'true' ? '<span class="card-featured-tag">Featured</span>' : '';
+  var verifiedHTML = l.verified === 'true' ? '<span class="card-verified-tag">&#10003; PESO</span>' : '';
+
+  return '<div class="job-card-item' + (l.featured === 'true' ? ' is-featured' : '') + '" data-id="' + l.id + '">' +
+    '<div class="card-banner-area">' + l.icon + featuredHTML + verifiedHTML + '</div>' +
     '<div class="card-body-area">' +
-    '<span class="' + typeBadgeClass + '">' + listingItem.type + '</span>' +
-    '<div class="card-company">' + listingItem.company + '</div>' +
-    '<div class="card-title">' + listingItem.title + '</div>' +
-    '<div class="card-location">&#128205; ' + listingItem.city + '</div>' +
-    '<div class="card-skills">' + skillTagsHTML + '</div>' +
+    '<span class="' + typeCls + '">' + l.type + '</span>' +
+    '<div class="card-company">' + l.company + '</div>' +
+    '<div class="card-title">' + l.title + '</div>' +
+    '<div class="card-location">&#128205; ' + l.city + '</div>' +
+    '<div class="card-skills">' + skillsHTML + '</div>' +
     '<div class="card-stats">' +
-    '<div><div class="card-stat-val">' + formatCurrency(listingItem.allowance) + '</div><div class="card-stat-key">Per Day</div></div>' +
-    '<div><div class="card-stat-val">' + listingItem.duration + '</div><div class="card-stat-key">Duration</div></div>' +
-    '<div><div class="card-stat-val">' + listingItem.slots + '</div><div class="card-stat-key">Slots</div></div>' +
+    '<div><div class="card-stat-val">' + formatCurrency(l.allowance) + '</div><div class="card-stat-key">Per Day</div></div>' +
+    '<div><div class="card-stat-val">' + l.duration + '</div><div class="card-stat-key">Duration</div></div>' +
+    '<div><div class="card-stat-val">' + l.slots + '</div><div class="card-stat-key">Slots</div></div>' +
     '</div></div>' +
     '<div class="card-action-row">' +
-    '<button class="card-act-btn card-act-no"   onclick="handleCardAction(\'pass\',' + listingItem.id + ')">&#8595; Pass</button>' +
-    '<button class="card-act-btn card-act-save"  onclick="handleCardAction(\'save\',' + listingItem.id + ')">&#128278; Save</button>' +
-    '<button class="card-act-btn card-act-yes"   onclick="handleCardAction(\'yes\','  + listingItem.id + ')">&#8593; Interested</button>' +
+    '<button class="card-act-btn card-act-no"   onclick="handleCardAction(\'pass\',' + l.id + ')">&#8595; Pass</button>' +
+    '<button class="card-act-btn card-act-save"  onclick="handleCardAction(\'save\',' + l.id + ')">&#128278; Save</button>' +
+    '<button class="card-act-btn card-act-yes"   onclick="handleCardAction(\'yes\','  + l.id + ')">&#8593; Interested</button>' +
     '</div></div>';
 }
 
 function renderListingCards(listingsArray, gridElementId) {
-  var gridElement = document.getElementById(gridElementId);
-  if (!gridElement) return;
-  if (listingsArray.length === 0) {
-    gridElement.innerHTML = '<div class="loading-placeholder">No listings found for your filters.</div>';
+  var grid = document.getElementById(gridElementId);
+  if (!grid) return;
+  if (!listingsArray.length) {
+    grid.innerHTML = '<div class="loading-placeholder">No listings found.</div>';
     return;
   }
-  gridElement.innerHTML = listingsArray.map(buildJobCardHTML).join('');
+  grid.innerHTML = listingsArray.map(buildJobCardHTML).join('');
 }
 
 function handleCardAction(actionType, listingId) {
   var session = JSON.parse(localStorage.getItem('sb_session') || 'null');
+  var listing  = (cachedListingsData || []).find(function(l) { return String(l.id) === String(listingId); });
+
   if (actionType === 'yes') {
     if (!session || !session.access_token) {
       showToast('Please log in to express interest.', 'warn');
-      setTimeout(function() { window.location.href = 'login.html'; }, 1200);
+      setTimeout(function() { window.location.href = 'login.html'; }, 1500);
       return;
     }
-    // Find employer_id from the listing data
-    var listing = (cachedListingsData || []).find(function(l) { return String(l.id) === String(listingId); });
-    fetch('/api/matches', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
-      body: JSON.stringify({ listing_id: parseInt(listingId), employer_id: null })
-    })
-    .then(function() { showToast('Interest recorded! Check My Matches.'); })
-    .catch(function() { showToast('Could not save interest. Try again.', 'error'); });
+    var matches = JSON.parse(localStorage.getItem('sb_local_matches') || '[]');
+    if (listing && !matches.find(function(m) { return String(m.listing.id) === String(listingId); })) {
+      matches.push({ id: 'match_' + Date.now(), listing: listing, timestamp: new Date().toISOString() });
+      localStorage.setItem('sb_local_matches', JSON.stringify(matches));
+    }
+    showToast('Interested! Check My Matches.');
   } else if (actionType === 'save') {
-    toggleBookmark(String(listingId));
+    var bookmarks = JSON.parse(localStorage.getItem('sb_bookmarks_full') || '[]');
+    var exists    = bookmarks.find(function(b) { return String(b.id) === String(listingId); });
+    if (!exists && listing) {
+      bookmarks.push(listing);
+      localStorage.setItem('sb_bookmarks_full', JSON.stringify(bookmarks));
+      showToast('Bookmarked! View in My Matches.');
+    } else {
+      bookmarks = bookmarks.filter(function(b) { return String(b.id) !== String(listingId); });
+      localStorage.setItem('sb_bookmarks_full', JSON.stringify(bookmarks));
+      showToast('Removed from bookmarks.', 'warn');
+    }
   } else if (actionType === 'pass') {
-    showToast('Passed on this listing.', 'warn');
+    var passed = JSON.parse(localStorage.getItem('sb_passed') || '[]');
+    if (!passed.includes(String(listingId))) {
+      passed.push(String(listingId));
+      localStorage.setItem('sb_passed', JSON.stringify(passed));
+    }
+    showToast('Passed.', 'warn');
+    var card = document.querySelector('[data-id="' + listingId + '"]');
+    if (card) {
+      card.style.transition = 'opacity .3s, transform .3s';
+      card.style.opacity    = '0';
+      card.style.transform  = 'translateX(-20px)';
+      setTimeout(function() { if (card.parentNode) card.parentNode.removeChild(card); }, 300);
+    }
   }
 }
 
 function getFallbackListings() {
-  return [
-    { id:'1', title:'Electrical Apprentice', company:'Santos Electric Services', type:'apprenticeship', industry:'electrical', city:'Batangas City', allowance:'450', duration:'6 months', slots:'2', skills:'Electrical Wiring, Safety Protocols', verified:'true', featured:'true', status:'active', posted:'2024-11-01', icon:'⚡' },
-    { id:'2', title:'IT Support Intern', company:'TechCore Solutions', type:'internship', industry:'it', city:'Calamba', allowance:'500', duration:'3 months', slots:'2', skills:'Troubleshooting, Networking', verified:'true', featured:'true', status:'active', posted:'2024-11-04', icon:'💻' },
-    { id:'3', title:'Web Development Intern', company:'DigiPinas Inc.', type:'internship', industry:'it', city:'Santa Rosa', allowance:'550', duration:'3 months', slots:'2', skills:'HTML, CSS, JavaScript', verified:'true', featured:'true', status:'active', posted:'2024-11-05', icon:'🌐' }
-  ];
+  return [];
 }
