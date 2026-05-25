@@ -211,7 +211,37 @@
 
 <script src="main.js"></script>
 <script src="xml-loader.js"></script>
-<script src="listings.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    loadListings(function(allListings) {
+      var featured = allListings.filter(function(l) {
+        return l.featured === 'true';
+      });
+      if (featured.length === 0) {
+        featured = allListings.slice(0, 6);
+      }
+      renderListingCards(featured, 'homeListingsGrid');
+    });
+  });
+
+  function filterHomeListings() {
+    var searchText = document.getElementById('homeSearchInput').value.toLowerCase();
+    var filterType = document.getElementById('homeFilterType').value;
+    var filterCity = document.getElementById('homeFilterCity').value;
+    loadListings(function(allListings) {
+      var featured = allListings.filter(function(l) {
+        return l.featured === 'true';
+      });
+      if (featured.length === 0) {
+        featured = allListings.slice(0, 6);
+      }
+      var filtered = applyListingFilters(featured, searchText, filterType, filterCity, '', '');
+      renderListingCards(filtered, 'homeListingsGrid');
+    });
+  }
+</script>
+</body>
+</html>
 
 
 </body>
